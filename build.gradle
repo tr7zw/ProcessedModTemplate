@@ -1,0 +1,93 @@
+plugins {
+	id 'maven-publish'
+	id "dev.architectury.loom" version "1.4-SNAPSHOT" apply false
+
+	// https://github.com/ReplayMod/preprocessor
+	// https://github.com/Fallen-Breath/preprocessor
+	id 'com.replaymod.preprocess' version '20c7ec554a'
+	id "com.diffplug.spotless" version "6.22.0"
+}
+
+tasks.named('assemble').get().dependsOn 'spotlessApply'
+
+spotless {
+	java {
+		target '**/*.java'
+		eclipse().configFile("${project.rootDir}/formatter.xml")
+		toggleOffOn()
+	}
+	format 'misc', {
+		target '**/*.gitattributes', '**/*.gitignore', '**/*.toml'
+
+		trimTrailingWhitespace()
+		endWithNewline()
+	}
+	yaml {
+		target '**/*.yaml'
+		jackson()
+	}
+	json {
+		target '**/*.json' 
+		gson()
+	}
+	flexmark {
+		target '**/*.md'
+		flexmark()
+	}
+}
+
+repositories {
+	mavenCentral()
+	maven {
+		url 'https://maven.fabricmc.net/'
+	}
+	maven {
+		url 'https://maven.architectury.dev/'
+	}
+	maven {
+		url 'https://jitpack.io'
+	}
+}
+
+preprocess {
+
+	def mc12002_fabric = createNode('1.20.2-fabric', 1_20_02, 'official')
+	def mc12004_fabric = createNode('1.20.4-fabric', 1_20_04, 'official')
+
+	def mc12002_forge  = createNode('1.20.2-forge' , 1_20_02, 'official')
+	def mc12004_forge  = createNode('1.20.4-forge' , 1_20_04, 'official')
+
+	def mc12004_neoforge  = createNode('1.20.4-neoforge' , 1_20_04, 'official')
+
+	mc12004_fabric.link(mc12002_fabric, null)
+
+	mc12002_fabric.link(mc12002_forge, null)
+	mc12004_fabric.link(mc12004_forge, null)
+
+	mc12004_fabric.link(mc12004_neoforge, null)
+}
+
+tasks.register('buildAndGather') {
+	subprojects {
+		dependsOn project.tasks.named('build').get()
+	}
+	doFirst {
+		println 'Gathering builds'
+		def buildLibs = {
+			p -> p.buildDir.toPath().resolve('libs')
+		}
+		delete fileTree(buildLibs(rootProject)) {
+			include '*'
+		}
+		subprojects {
+			copy {
+				from(buildLibs(project)) {
+					include '*.jar'
+					exclude '*-dev.jar', '*-sources.jar'
+				}
+				into buildLibs(rootProject)
+				duplicatesStrategy DuplicatesStrategy.INCLUDE
+			}
+		}
+	}
+}

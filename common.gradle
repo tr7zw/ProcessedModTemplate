@@ -1,0 +1,230 @@
+plugins {
+	id "dev.architectury.loom" version "1.4-SNAPSHOT" apply false
+	id 'com.github.johnrengelman.shadow' version '7.1.2' apply false
+	id "com.diffplug.spotless" version "6.22.0" apply false
+	
+    // This dependency is only used to determine the state of the Git working tree so that build artifacts can be
+    // more easily identified. This setup is copied from sodium
+    id 'org.ajoberstar.grgit' version '5.2.0'
+}
+
+apply plugin: 'eclipse'
+apply plugin: "dev.architectury.loom"
+apply plugin: 'com.replaymod.preprocess'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+def mod_brand = (loom.platform.get() as String).toLowerCase()
+assert mod_brand in ['fabric', 'forge', 'neoforge']
+assert project.name.endsWith('-' + mod_brand)  // optional check
+
+int mcVersion = 1
+preprocess {
+	mcVersion = vars.get()["MC"] as int
+	tabIndentation = false
+
+	vars.put("MC", mcVersion)
+	vars.put("FABRIC", mod_brand == 'fabric' ? 1 : 0)
+	vars.put("FORGE", mod_brand == 'forge' ? 1 : 0)
+	vars.put("NEOFORGE", mod_brand == 'neoforge' ? 1 : 0)
+}
+
+loom {
+	if (mod_brand != 'neoforge') {
+		mixin {
+			useLegacyMixinAp = true
+			defaultRefmapName = "$id$.refmap.mixins.json"
+		}
+	}
+	runConfigs.all {
+		// to make sure it generates all "Minecraft Client (:subproject_name)" applications
+		ideConfigGenerated = true
+		runDir '../../run'
+	}
+	silentMojangMappingsLicense()
+	if (mod_brand == 'forge') {
+		forge.mixinConfigs "${modid}.mixins.json"
+	}
+	<accesswidener>
+	accessWidenerPath = file("../Shared/src/main/resources/$id$.accesswidener")
+	</accesswidener>
+}
+
+configurations {
+	inc
+	implementation.extendsFrom inc
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	mappings loom.layered() {
+		officialMojangMappings()
+		if (mcVersion >= 12004) {
+			parchment("org.parchmentmc.data:parchment-${rootProject.parchment_mc_version_20_4}:${rootProject.parchment_version_20_4}@zip")
+		} else if(mcVersion >= 12002) {
+			parchment("org.parchmentmc.data:parchment-${rootProject.parchment_mc_version_20_2}:${rootProject.parchment_version_20_2}@zip")
+		}
+	}
+
+	compileOnly 'org.projectlombok:lombok:1.18.30'
+	annotationProcessor 'org.projectlombok:lombok:1.18.30'
+	
+	testCompileOnly 'org.projectlombok:lombok:1.18.30'
+	testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
+
+	if (mod_brand == 'fabric') {
+		modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
+
+		modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+    	modImplementation "maven.modrinth:modmenu:${project.mod_menu_release}"
+	} else if (mod_brand == 'forge') {
+		forge "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
+
+		forgeRuntimeLibrary project(":3dSkinLayers-Versionless") 
+	} else if (mod_brand == 'neoforge') {
+		neoForge "net.neoforged:neoforge:${project.neoforge_version}"
+		forgeRuntimeLibrary project(":3dSkinLayers-Versionless") 
+	}
+
+//    sourceSets.main.java.srcDirs += "${project.rootDir}/UtilityCode/${project.minecraft_version}/src/main/java"
+//	sourceSets.main.resources.srcDirs += "${project.rootDir}/UtilityCode/${project.minecraft_version}/src/main/resources"
+
+	inc project(":3dSkinLayers-Versionless") 
+
+}
+
+shadowJar {
+	configurations = [project.configurations.inc]
+	relocate 'dev.tr7zw.util', '$relocationpackage$.util'
+	relocate 'dev.tr7zw.config', '$relocationpackage$.config'
+}
+
+remapJar {
+	dependsOn(shadowJar)
+	input = shadowJar.archiveFile
+
+	doLast {
+		// Delete the shadowJar.archiveFile after remapJar task is executed
+		delete shadowJar.archiveFile
+	}
+}
+
+processResources {
+	duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+
+	/*var replaceProperties = [
+			minecraft_version   : minecraft_version, minecraft_version_range_forge: minecraft_version_range_forge,
+			neoforge_version         : neoforge_version, neo_version_range: neo_version_range,
+			minecraft_version_range_fabric: minecraft_version_range_fabric,
+			loader_version_range_neoforge: loader_version_range_neoforge,
+			loader_version_range_forge: loader_version_range_forge,
+			description		 : "$description$",
+			homepage_url		 : "$homepageUrl$",
+			sources_url		 : "$sourcesUrl$",
+			issues_url		 : "$issuesUrl$",
+			license_name: "$licenseName$",
+			mod_id              : "$id$", mod_name: "$name$", version: "$version$${getVersionMetadata()}",
+			mod_author         : "$author$", pack_format_number: pack_format_number,
+	]
+	inputs.properties replaceProperties
+
+	filesMatching(['fabric.mod.json', 'META-INF/mods.toml', 'pack.mcmeta']) {
+		expand replaceProperties + [project: project]
+	}
+
+	from "${project.rootDir}/$licensename$"*/
+
+}
+
+afterEvaluate { project ->
+	project.tasks.withType(JavaExec) { task ->
+		if (task.name.startsWith("runClient")) {
+			task.doFirst {
+				def binDir = project.file('bin')
+				if (binDir.exists()) {
+					deleteBinDir(binDir)
+				}
+			}
+		}
+	}
+}
+
+archivesBaseName = rootProject.archives_base_name
+version = mod_brand + "-" + rootProject.mod_version + "-mc" + project.minecraft_version + getVersionMetadata()
+group = rootProject.maven_group
+
+repositories {
+	// Add repositories to retrieve artifacts from in here.
+	// You should only use this when depending on other mods because
+	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
+	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
+	// for more information about repositories.
+	maven {
+		name = "Modrinth"
+		url = "https://api.modrinth.com/maven"
+		content {
+			includeGroup "maven.modrinth"
+		}
+	}
+	maven { url "https://maven.neoforged.net/releases/" }
+	maven {
+		// for fabric
+		url = "https://maven.modmuss50.me/"
+	}
+	maven {
+		url "https://cursemaven.com"
+	}
+	maven { url "https://repo.codemc.io/repository/maven-public/" }
+	maven { url "https://repo.codemc.io/repository/maven-snapshots/" }
+	maven { url "https://aperlambda.github.io/maven" }
+	maven { url 'https://jitpack.io' }
+	maven {
+		name = 'ParchmentMC'
+		url = 'https://maven.parchmentmc.org'
+	}
+}
+
+tasks.withType(JavaCompile) {
+	options.encoding = "UTF-8"
+}
+
+if (mcVersion >= 11800) {
+	sourceCompatibility = JavaVersion.VERSION_17
+	targetCompatibility = JavaVersion.VERSION_17
+} else if (mcVersion >= 11700) {
+	sourceCompatibility = JavaVersion.VERSION_16
+	targetCompatibility = JavaVersion.VERSION_16
+} else {
+	sourceCompatibility = JavaVersion.VERSION_1_8
+	targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+java {
+	//withSourcesJar()
+}
+
+def getVersionMetadata() {
+    // CI builds only
+    if (project.hasProperty("build.release")) {
+        return "" // no tag whatsoever
+    }
+
+    if (grgit != null) {
+        def head = grgit.head()
+        def id = head.abbreviatedId
+
+        // Flag the build if the build tree is not clean
+        if (!grgit.status().clean) {
+            id += "-dirty"
+        }
+
+        return "+git.${id}"
+    }
+
+    // No tracking information could be found about the build
+    return "+unknown"
+}
+
+// Function to delete bin directory recursively
+def deleteBinDir(dir) {
+    ant.delete(dir: dir, failonerror: false)
+}

@@ -1,0 +1,27 @@
+version: '0.0.2'
+defaultReplacements:
+  dependencies: ""
+  licensename: "LICENSE"
+  author: "tr7zw"
+  group: "dev.tr7zw"
+  licenseName: "tr7zw Protective License"
+  description: "Allan, please add details!"
+  homepageUrl: "https://github.com/tr7zw"
+  sourcesUrl: "https://github.com/tr7zw"
+  issuesUrl: "https://github.com/tr7zw"
+customEntries:
+  - versions/1.20.2-fabric/gradle.properties
+  - versions/1.20.2-forge/gradle.properties
+  - versions/1.20.4-fabric/gradle.properties
+  - versions/1.20.4-forge/gradle.properties
+  - formatter.xml
+  - common.gradle
+availableFlags:
+  - autopublish
+  - modrinth
+  - curseforge
+  - publishForge
+  - publishFabric
+  - publishNeo
+  - accesswidener
+  - versionless
