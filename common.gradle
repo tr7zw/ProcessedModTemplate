@@ -167,14 +167,21 @@ processResources {
 
 }
 
+sourceSets.each {
+	def dir = layout.buildDirectory.dir("sourcesSets/$it.name")
+	it.output.resourcesDir = dir
+	it.java.destinationDirectory = dir
+}
+
 afterEvaluate { project ->
-	project.tasks.withType(JavaExec) { task ->
+	project.tasks.withType(JavaExec).configureEach { task ->
 		if (task.name.startsWith("runClient")) {
 			task.doFirst {
 				def binDir = project.file('bin')
 				if (binDir.exists()) {
 					deleteBinDir(binDir)
 				}
+
 			}
 		}
 	}

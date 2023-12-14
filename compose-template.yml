@@ -15,6 +15,9 @@ customEntries:
   - versions/1.20.4-fabric/gradle.properties
   - versions/1.20.4-forge/gradle.properties
   - versions/1.20.4-neoforge/gradle.properties
+  - src/main/neoforge-resources/META-INF/mods.toml
+  - src/main/forge-resources/META-INF/mods.toml
+  - src/main/fabric-resources/fabric.mod.json
   - formatter.xml
   - common.gradle
 availableFlags:
