@@ -76,13 +76,19 @@ dependencies {
 
 		modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
     	modImplementation "maven.modrinth:modmenu:${project.mod_menu_release}"
+
+		sourceSets.main.resources.srcDirs += "${project.rootDir}/src/main/fabric-resources"
 	} else if (mod_brand == 'forge') {
 		forge "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
 
 		forgeRuntimeLibrary project(":3dSkinLayers-Versionless") 
+
+		sourceSets.main.resources.srcDirs += "${project.rootDir}/src/main/forge-resources"
 	} else if (mod_brand == 'neoforge') {
 		neoForge "net.neoforged:neoforge:${project.neoforge_version}"
 		forgeRuntimeLibrary project(":3dSkinLayers-Versionless") 
+
+		sourceSets.main.resources.srcDirs += "${project.rootDir}/src/main/neoforge-resources"
 	}
 
 //    sourceSets.main.java.srcDirs += "${project.rootDir}/UtilityCode/${project.minecraft_version}/src/main/java"
@@ -111,19 +117,45 @@ remapJar {
 processResources {
 	duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
 
-	/*var replaceProperties = [
-			minecraft_version   : minecraft_version, minecraft_version_range_forge: minecraft_version_range_forge,
-			neoforge_version         : neoforge_version, neo_version_range: neo_version_range,
-			minecraft_version_range_fabric: minecraft_version_range_fabric,
-			loader_version_range_neoforge: loader_version_range_neoforge,
-			loader_version_range_forge: loader_version_range_forge,
+	def neoforgeVersionRange = project.hasProperty('neo_version_range') ? project.neo_version_range : ''
+	def neoforgeLoaderVersion = project.hasProperty('loader_version_range_neoforge') ? project.loader_version_range_neoforge : ''
+	
+	def forgeLoaderVersion = project.hasProperty('loader_version_range_forge') ? project.loader_version_range_forge : ''
+
+	def versionsMap = [
+		10809: 1,
+		11002: 2,
+		11112: 3,
+		11314: 4,
+		11516: 5,
+		11625: 6,
+		11701: 7,
+		11802: 8,
+		11902: 9,
+		11903: 12,
+		11904: 13,
+		12001: 15,
+		12002: 18,
+		12003: 21,
+		12004: 22
+	]
+
+	var replaceProperties = [
+			minecraft_version   : minecraft_version, minecraft_version_range_forge: minecraft_version,
+			minecraft_version_range_neoforge         : minecraft_version,
+			minecraft_version_range_fabric: minecraft_version,
+			loader_version_range_neoforge: neoforgeLoaderVersion,
+			loader_version_range_forge: forgeLoaderVersion,
+			neo_version_range: neoforgeVersionRange,
+			fabric_entrypoint   : "$fabric_entrypoint$",
+			fabric_modmenu_entrypoint: "$fabric_modmenu_entrypoint$",
 			description		 : "$description$",
 			homepage_url		 : "$homepageUrl$",
 			sources_url		 : "$sourcesUrl$",
 			issues_url		 : "$issuesUrl$",
 			license_name: "$licenseName$",
 			mod_id              : "$id$", mod_name: "$name$", version: "$version$${getVersionMetadata()}",
-			mod_author         : "$author$", pack_format_number: pack_format_number,
+			mod_author         : "$author$", pack_format_number: versionsMap[mcVersion],
 	]
 	inputs.properties replaceProperties
 
@@ -131,7 +163,7 @@ processResources {
 		expand replaceProperties + [project: project]
 	}
 
-	from "${project.rootDir}/$licensename$"*/
+	from "${project.rootDir}/$licensename$"
 
 }
 
