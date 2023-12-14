@@ -50,20 +50,27 @@ repositories {
 }
 
 preprocess {
-
-	def mc12002_fabric = createNode('1.20.2-fabric', 1_20_02, 'official')
-	def mc12004_fabric = createNode('1.20.4-fabric', 1_20_04, 'official')
+	def mc12001_forge  = createNode('1.20.1-forge' , 1_20_01, 'official')
+	def mc12001_fabric = createNode('1.20.1-fabric', 1_20_01, 'official')
 
 	def mc12002_forge  = createNode('1.20.2-forge' , 1_20_02, 'official')
-	def mc12004_forge  = createNode('1.20.4-forge' , 1_20_04, 'official')
+	def mc12002_neoforge  = createNode('1.20.2-neoforge' , 1_20_02, 'official')
+	def mc12002_fabric = createNode('1.20.2-fabric', 1_20_02, 'official')
 
+	def mc12004_fabric = createNode('1.20.4-fabric', 1_20_04, 'official')
+	def mc12004_forge  = createNode('1.20.4-forge' , 1_20_04, 'official')
 	def mc12004_neoforge  = createNode('1.20.4-neoforge' , 1_20_04, 'official')
 
+	// 1.20.1
+	mc12002_fabric.link(mc12001_fabric, null)
+	mc12001_fabric.link(mc12001_forge, null)
+	// 1.20.2
 	mc12004_fabric.link(mc12002_fabric, null)
-
 	mc12002_fabric.link(mc12002_forge, null)
+	mc12002_fabric.link(mc12002_neoforge, null)
+	// 1.20.4
+	// fabric 1.20.4 is technically here
 	mc12004_fabric.link(mc12004_forge, null)
-
 	mc12004_fabric.link(mc12004_neoforge, null)
 }
 
