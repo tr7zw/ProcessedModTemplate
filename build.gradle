@@ -50,6 +50,9 @@ repositories {
 }
 
 preprocess {
+	def mc11902_forge  = createNode('1.19.2-forge' , 1_19_02, 'official')
+	def mc11902_fabric = createNode('1.19.2-fabric', 1_19_02, 'official')
+
 	def mc11903_forge  = createNode('1.19.3-forge' , 1_19_03, 'official')
 	def mc11903_fabric = createNode('1.19.3-fabric', 1_19_03, 'official')
 
@@ -67,6 +70,9 @@ preprocess {
 	def mc12004_forge  = createNode('1.20.4-forge' , 1_20_04, 'official')
 	def mc12004_neoforge  = createNode('1.20.4-neoforge' , 1_20_04, 'official')
 
+	// 1.19.2
+	mc11902_fabric.link(mc11902_forge, null)
+	mc11903_fabric.link(mc11902_fabric, null)
 	// 1.19.3
 	mc11903_fabric.link(mc11903_forge, null)
 	mc11904_fabric.link(mc11903_fabric, null)

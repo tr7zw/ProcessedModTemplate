@@ -12,7 +12,7 @@
         "sources": "${sources_url}"
     },
     "license": "${license_name}",
-    "icon": "assets/${mod_id}/icon.png",
+    "icon": "icon.png",
     "environment": "client",
     "entrypoints": {
         "client": [
