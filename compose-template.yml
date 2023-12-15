@@ -10,6 +10,8 @@ defaultReplacements:
   sourcesUrl: "https://github.com/tr7zw"
   issuesUrl: "https://github.com/tr7zw"
 customEntries:
+  - versions/1.19.4-fabric/gradle.properties
+  - versions/1.19.4-forge/gradle.properties
   - versions/1.20.1-fabric/gradle.properties
   - versions/1.20.1-forge/gradle.properties
   - versions/1.20.2-fabric/gradle.properties
