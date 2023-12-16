@@ -44,9 +44,11 @@ loom {
 	if (mod_brand == 'forge') {
 		forge.mixinConfigs "${modid}.mixins.json"
 	}
-	<accesswidener>
-	accessWidenerPath = file("../Shared/src/main/resources/$id$.accesswidener")
-	</accesswidener>
+	
+	if(file("src/main/resources/$id$.accesswidener").exists()){
+		accessWidenerPath = file("src/main/resources/$id$.accesswidener")
+	}
+
 }
 
 configurations {
@@ -124,11 +126,9 @@ processResources {
 
 	def versionsMap = [
 		10809: 1,
-		11002: 2,
-		11112: 3,
-		11314: 4,
-		11516: 5,
-		11625: 6,
+		11202: 3,
+		11500: 5,
+		11605: 6,
 		11701: 7,
 		11802: 8,
 		11902: 9,
