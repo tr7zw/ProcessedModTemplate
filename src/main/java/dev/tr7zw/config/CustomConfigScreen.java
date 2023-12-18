@@ -20,6 +20,11 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+//spotless:off 
+//#if MC <= 11904
+//$$ import com.mojang.blaze3d.vertex.PoseStack;
+//#endif
+//spotless:on
 
 public abstract class CustomConfigScreen extends Screen {
 
@@ -46,7 +51,13 @@ public abstract class CustomConfigScreen extends Screen {
     }
 
     protected void init() {
+        // spotless:off
+        //#if MC <= 12002
+        //$$ this.list = new OptionsList(this.minecraft, this.width, this.height, 32, this.height - 32, 25);
+        //#else
         this.list = new OptionsList(this.minecraft, this.width, this.height - 64, 32, 25);
+        //#endif
+        // spotless:on
         this.addWidget(this.list);
         this.createFooter();
         initialize();
@@ -65,7 +76,7 @@ public abstract class CustomConfigScreen extends Screen {
                 CustomConfigScreen.this.onClose();
             }
         }).pos(this.width / 2 - 100, this.height - 27).size(200, 20).build());
-        
+
         this.addRenderableWidget(Button.builder(Component.translatable("controls.reset"), new OnPress() {
             @Override
             public void onPress(Button button) {
@@ -73,35 +84,57 @@ public abstract class CustomConfigScreen extends Screen {
                 CustomConfigScreen.this.resize(minecraft, width, height); // refresh
             }
         }).pos(this.width / 2 + 110, this.height - 27).size(60, 20).build());
-        
-        this.addRenderableWidget(new PlainTextButton(5, 5, 400, 20, Component.literal("Enjoying the mod? Consider supporting the developer!"), new OnPress() {
-            @Override
-            public void onPress(Button button) {
-                Util.getPlatform().openUri("https://tr7zw.dev/donate/");
-            }
-        }, minecraft.font));
+
+        this.addRenderableWidget(new PlainTextButton(5, 5, 400, 20,
+                Component.literal("Enjoying the mod? Consider supporting the developer!"), new OnPress() {
+                    @Override
+                    public void onPress(Button button) {
+                        Util.getPlatform().openUri("https://tr7zw.dev/donate/");
+                    }
+                }, minecraft.font));
     }
 
+    // spotless:off 
+    //#if MC >= 12001
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+    	//#if MC >= 12002
         super.render(guiGraphics, i, j, f);
+        //#else
+        //$$ this.renderBackground(guiGraphics);
+        //#endif
         this.list.render(guiGraphics, i, j, f);
         guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 16777215);
+        //#if MC <= 12001
+        //$$ super.render(guiGraphics, i, j, f);
+        //#endif
     }
+    //#else
+    //$$ public void render(PoseStack poseStack, int i, int j, float f) {
+    //$$    this.renderBackground(poseStack);
+    //$$    this.list.render(poseStack, i, j, f);
+    //$$    drawCenteredString(poseStack, this.font, this.title, this.width / 2, 20, 16777215);
+    //$$    super.render(poseStack, i, j, f);
+    //$$ }
+    //#endif
 
+
+    //#if MC >= 12002
     @Override
     public void renderTransparentBackground(GuiGraphics guiGraphics) {
         // we always want the dirt background
         renderDirtBackground(guiGraphics);
     }
+    //#endif
+    // spotless:on
 
-    private <T> TooltipSupplier<T>  getOptionalTooltip(String translationKey) {
+    private <T> TooltipSupplier<T> getOptionalTooltip(String translationKey) {
         return new TooltipSupplier<T>() {
 
             @Override
             public Tooltip apply(T param1t) {
                 String key = translationKey + ".tooltip";
                 Component comp = Component.translatable(key);
-                if(key.equals(comp.getString())) {
+                if (key.equals(comp.getString())) {
                     return null;
                 } else {
                     return Tooltip.create(comp);
@@ -109,7 +142,7 @@ public abstract class CustomConfigScreen extends Screen {
             }
         };
     }
-    
+
     public OptionInstance<Boolean> getBooleanOption(String translationKey, Supplier<Boolean> current,
             Consumer<Boolean> update) {
         return OptionInstance.createBoolean(translationKey, getOptionalTooltip(translationKey), current.get(), update);
