@@ -12,6 +12,8 @@ defaultReplacements:
 customEntries:
   - versions/1.16.5-fabric/gradle.properties
   - versions/1.16.5-forge/gradle.properties
+  - versions/1.17.1-fabric/gradle.properties
+  - versions/1.17.1-forge/gradle.properties
   - versions/1.18.2-fabric/gradle.properties
   - versions/1.18.2-forge/gradle.properties
   - versions/1.19.2-fabric/gradle.properties

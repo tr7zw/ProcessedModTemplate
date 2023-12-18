@@ -53,6 +53,9 @@ preprocess {
 	def mc11605_forge  = createNode('1.16.5-forge' , 1_16_05, 'official')
 	def mc11605_fabric = createNode('1.16.5-fabric', 1_16_05, 'official')
 
+	def mc11701_forge  = createNode('1.17.1-forge' , 1_17_01, 'official')
+	def mc11701_fabric = createNode('1.17.1-fabric', 1_17_01, 'official')
+
 	def mc11802_forge  = createNode('1.18.2-forge' , 1_18_02, 'official')
 	def mc11802_fabric = createNode('1.18.2-fabric', 1_18_02, 'official')
 
@@ -78,7 +81,10 @@ preprocess {
 
 	// 1.16.5
 	mc11605_fabric.link(mc11605_forge, null)
-	mc11802_fabric.link(mc11605_fabric, null)
+	mc11701_fabric.link(mc11605_fabric, null)
+	// 1.17.1
+	mc11701_fabric.link(mc11701_forge, null)
+	mc11802_fabric.link(mc11701_fabric, null)
 	// 1.18.2
 	mc11802_fabric.link(mc11802_forge, null)
 	mc11902_fabric.link(mc11802_fabric, null)
