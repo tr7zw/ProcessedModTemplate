@@ -5,7 +5,7 @@ plugins {
 	
     // This dependency is only used to determine the state of the Git working tree so that build artifacts can be
     // more easily identified. This setup is copied from sodium
-    id 'org.ajoberstar.grgit' version '5.2.0'
+    id 'org.ajoberstar.grgit' version '5.2.1'
 }
 
 apply plugin: 'eclipse'
@@ -229,6 +229,9 @@ tasks.withType(JavaCompile) {
 if (mcVersion >= 11800) {
 	sourceCompatibility = JavaVersion.VERSION_17
 	targetCompatibility = JavaVersion.VERSION_17
+} else if (mcVersion >= 11700) {
+	sourceCompatibility = JavaVersion.VERSION_16
+	targetCompatibility = JavaVersion.VERSION_16
 } else {
 	sourceCompatibility = JavaVersion.VERSION_1_8
 	targetCompatibility = JavaVersion.VERSION_1_8
@@ -249,8 +252,9 @@ def getVersionMetadata() {
         def id = head.abbreviatedId
 
         // Flag the build if the build tree is not clean
-        if (!grgit.status().clean) {
+        if (!grgit.status().isClean()) {
             id += "-dirty"
+            println "Changes: " + grgit.status().staged.getAllChanges() + " " + grgit.status().unstaged.getAllChanges()
         }
 
         return "+git.${id}"
