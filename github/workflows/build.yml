@@ -31,8 +31,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: Artifacts
-          path: |
-$autoworkflowfiles$
+          path: '**/build/libs/*.jar'
 
       - name: Test Report
         uses: dorny/test-reporter@v1
