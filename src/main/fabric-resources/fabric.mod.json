@@ -13,7 +13,6 @@
     },
     "license": "${license_name}",
     "icon": "icon.png",
-    "environment": "client",
     "entrypoints": {
         "client": [
             "${fabric_entrypoint}"
