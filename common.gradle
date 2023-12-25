@@ -83,12 +83,12 @@ dependencies {
 	} else if (mod_brand == 'forge') {
 		forge "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
 
-		forgeRuntimeLibrary project(":3dSkinLayers-Versionless") 
+		forgeRuntimeLibrary project(":$versionlessname$") 
 
 		sourceSets.main.resources.srcDirs += "${project.rootDir}/src/main/forge-resources"
 	} else if (mod_brand == 'neoforge') {
 		neoForge "net.neoforged:neoforge:${project.neoforge_version}"
-		forgeRuntimeLibrary project(":3dSkinLayers-Versionless") 
+		forgeRuntimeLibrary project(":$versionlessname$") 
 
 		sourceSets.main.resources.srcDirs += "${project.rootDir}/src/main/neoforge-resources"
 	}
@@ -96,7 +96,7 @@ dependencies {
 //    sourceSets.main.java.srcDirs += "${project.rootDir}/UtilityCode/${project.minecraft_version}/src/main/java"
 //	sourceSets.main.resources.srcDirs += "${project.rootDir}/UtilityCode/${project.minecraft_version}/src/main/resources"
 
-	inc project(":3dSkinLayers-Versionless") 
+	inc project(":$versionlessname$") 
 
 }
 
