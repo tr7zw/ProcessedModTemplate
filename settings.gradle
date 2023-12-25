@@ -25,7 +25,7 @@ pluginManagement {
 	}
 }
 
-include(":3dSkinLayers-Versionless")
+include(":$versionlessname$")
 
 def settings = new JsonSlurper().parseText(file('settings.json').text)
 for (String version : settings.versions) {
