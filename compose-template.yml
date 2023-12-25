@@ -33,6 +33,7 @@ customEntries:
   - src/main/neoforge-resources/META-INF/mods.toml
   - src/main/forge-resources/META-INF/mods.toml
   - src/main/fabric-resources/fabric.mod.json
+  - src/main/resources/pack.mcmeta
   - src/main/java/dev/tr7zw/config/CustomConfigScreen.java
   - src/main/java/dev/tr7zw/util/ComponentProvider.java
   - versions/1.16.5-fabric/src/main/java/dev/tr7zw/config/CustomConfigScreen.java
