@@ -2,13 +2,17 @@ package dev.tr7zw.config;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import dev.tr7zw.util.ComponentProvider;
+import net.minecraft.Util;
 import net.minecraft.client.CycleOption;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.ProgressOption;
@@ -19,7 +23,7 @@ import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.CycleButton.TooltipSupplier;
 import net.minecraft.client.gui.components.OptionsList;
 import net.minecraft.client.gui.components.SliderButton;
-import net.minecraft.client.gui.screens.OptionsSubScreen;
+import net.minecraft.client.gui.components.TooltipAccessor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -81,6 +85,13 @@ public abstract class CustomConfigScreen extends Screen {
                         CustomConfigScreen.this.resize(minecraft, width, height); // refresh
                     }
                 }));
+        this.addRenderableWidget(new net.minecraft.client.gui.components.PlainTextButton(5, 5, 400, 20,
+                ComponentProvider.literal("Enjoying the mod? Consider supporting the developer!"), new OnPress() {
+                    @Override
+                    public void onPress(Button button) {
+                        Util.getPlatform().openUri("https://tr7zw.dev/donate/");
+                    }
+                }, minecraft.font));
     }
 
     public void render(PoseStack poseStack, int i, int j, float f) {
@@ -88,7 +99,7 @@ public abstract class CustomConfigScreen extends Screen {
         this.list.render(poseStack, i, j, f);
         drawCenteredString(poseStack, this.font, this.title, this.width / 2, 20, 16777215);
         super.render(poseStack, i, j, f);
-        List<FormattedCharSequence> list = OptionsSubScreen.tooltipAt(this.list, i, j);
+        List<FormattedCharSequence> list = tooltipAt(this.list, i, j);
         this.renderTooltip(poseStack, list, i, j);
     }
 
@@ -184,6 +195,14 @@ public abstract class CustomConfigScreen extends Screen {
             };
         };
     }
+    
+	public static List<FormattedCharSequence> tooltipAt(OptionsList optionsList, int i, int j) {
+		if(!optionsList.isMouseOver(i, j))return ImmutableList.of();
+		Optional<AbstractWidget> optional = optionsList.getMouseOver((double) i, (double) j);
+		return (List<FormattedCharSequence>) (optional.isPresent() && optional.get() instanceof TooltipAccessor
+				? ((TooltipAccessor) optional.get()).getTooltip()
+				: ImmutableList.of());
+	}
 
     public static double round(double value, int places) {
         if (places < 0)
