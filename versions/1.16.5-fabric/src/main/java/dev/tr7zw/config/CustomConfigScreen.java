@@ -8,10 +8,13 @@ import java.util.function.Supplier;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import dev.tr7zw.util.ComponentProvider;
+import net.minecraft.Util;
 import net.minecraft.client.BooleanOption;
 import net.minecraft.client.CycleOption;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.ProgressOption;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Button.OnPress;
@@ -21,9 +24,12 @@ import net.minecraft.client.gui.components.TooltipAccessor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentUtils;
+import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.Mth;
 
 public abstract class CustomConfigScreen extends Screen {
 
@@ -80,6 +86,13 @@ public abstract class CustomConfigScreen extends Screen {
                         CustomConfigScreen.this.resize(minecraft, width, height); // refresh
                     }
                 }));
+        this.addButton(new PlainTextButton(5, 5, 400, 20,
+                ComponentProvider.literal("Enjoying the mod? Consider supporting the developer!"), new OnPress() {
+                    @Override
+                    public void onPress(Button button) {
+                        Util.getPlatform().openUri("https://tr7zw.dev/donate/");
+                    }
+                }, minecraft.font));
     }
 
     public void render(PoseStack poseStack, int i, int j, float f) {
@@ -101,7 +114,7 @@ public abstract class CustomConfigScreen extends Screen {
     }
 
     public BooleanOption getBooleanOption(String translationKey, Supplier<Boolean> current, Consumer<Boolean> update) {
-        BooleanOption option = new BooleanOption(translationKey, title, (options) -> current.get(),
+        BooleanOption option = new BooleanOption(translationKey, null, (options) -> current.get(),
                 (options, b) -> update.accept(b));
         option.setTooltip(createStaticTooltip(translationKey));
         return option;
@@ -116,7 +129,7 @@ public abstract class CustomConfigScreen extends Screen {
         TranslatableComponent comp = new TranslatableComponent(translationKey);
         ProgressOption option = new ProgressOption(translationKey, min, max, steps, (options) -> current.get(),
                 (options, val) -> update.accept(val),
-                (options, opt) -> comp.append(new TextComponent(": " + opt.get(options))));
+                (options, opt) -> comp.append(new TextComponent(": " + round(opt.get(options), 3))));
         option.setTooltip(createStaticTooltip(translationKey));
         return option;
     }
@@ -142,7 +155,7 @@ public abstract class CustomConfigScreen extends Screen {
                                 % targetEnum.getEnumConstants().length]),
                 (options, cycleOption) -> {
                     cycleOption.setTooltip(createStaticTooltip(translationKey));
-                    return new TranslatableComponent(translationKey + "." + current.get().name());
+                    return new TranslatableComponent(translationKey).append(": ").append(new TranslatableComponent(translationKey + "." + current.get().name()));
                 });
 
         return option;
@@ -159,12 +172,42 @@ public abstract class CustomConfigScreen extends Screen {
     }
 
     public static List<FormattedCharSequence> tooltipAt(OptionsList arg, int i, int j) {
+    	if(!arg.isMouseOver(i, j))return null;
         Optional<AbstractWidget> optional = arg.getMouseOver(i, j);
         if (optional.isPresent() && optional.get() instanceof TooltipAccessor) {
             Optional<List<FormattedCharSequence>> optional2 = ((TooltipAccessor) optional.get()).getTooltip();
             return optional2.orElse(null);
         }
         return null;
+    }
+    
+    public static double round(double value, int places) {
+        if (places < 0)
+            throw new IllegalArgumentException();
+
+        long factor = (long) Math.pow(10, places);
+        value = value * factor;
+        long tmp = Math.round(value);
+        return (double) tmp / factor;
+    }
+    
+    public class PlainTextButton extends Button {
+    	private final Font font;
+    	private final Component message;
+    	private final Component underlinedMessage;
+
+    	public PlainTextButton(int x, int y, int width, int height, Component message, OnPress onPress, Font font) {
+    		super(x, y, width, height, message, onPress);
+    		this.font = font;
+    		this.message = message;
+    		this.underlinedMessage = ComponentUtils.mergeStyles(message.copy(), Style.EMPTY.withUnderlined(true));
+    	}
+
+    	public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+    		Component component = this.isHovered() ? this.underlinedMessage : this.message;
+    		drawString(poseStack, this.font, component, this.x, this.y,
+    				16777215 | Mth.ceil(this.alpha * 255.0F) << 24);
+    	}
     }
 
 }
