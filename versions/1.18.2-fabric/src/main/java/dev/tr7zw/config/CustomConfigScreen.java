@@ -16,6 +16,7 @@ import net.minecraft.Util;
 import net.minecraft.client.CycleOption;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.ProgressOption;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Button.OnPress;
@@ -27,8 +28,11 @@ import net.minecraft.client.gui.components.TooltipAccessor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentUtils;
+import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.Mth;
 
 public abstract class CustomConfigScreen extends Screen {
 
@@ -85,7 +89,7 @@ public abstract class CustomConfigScreen extends Screen {
                         CustomConfigScreen.this.resize(minecraft, width, height); // refresh
                     }
                 }));
-        this.addRenderableWidget(new net.minecraft.client.gui.components.PlainTextButton(5, 5, 400, 20,
+        this.addRenderableWidget(new PlainTextButton(5, 5, 400, 20,
                 ComponentProvider.literal("Enjoying the mod? Consider supporting the developer!"), new OnPress() {
                     @Override
                     public void onPress(Button button) {
@@ -212,6 +216,24 @@ public abstract class CustomConfigScreen extends Screen {
         value = value * factor;
         long tmp = Math.round(value);
         return (double) tmp / factor;
+    }
+    
+    public class PlainTextButton extends Button {
+    	private final Font font;
+    	private final Component message;
+    	private final Component underlinedMessage;
+
+    	public PlainTextButton(int i, int j, int k, int l, Component component, OnPress onPress, Font font) {
+    		super(i, j, k, l, component, onPress);
+    		this.font = font;
+    		this.message = component;
+    		this.underlinedMessage = ComponentUtils.mergeStyles(component.copy(), Style.EMPTY.withUnderlined(true));
+    	}
+
+    	public void renderButton(PoseStack poseStack, int i, int j, float f) {
+    		Component component = this.isHoveredOrFocused() ? this.underlinedMessage : this.message;
+    		drawString(poseStack, this.font, component, this.x, this.y, 16777215 | Mth.ceil(this.alpha * 255.0F) << 24);
+    	}
     }
 
 }
