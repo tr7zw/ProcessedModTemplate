@@ -79,22 +79,30 @@ dependencies {
 		modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
     	modImplementation "maven.modrinth:modmenu:${project.mod_menu_release}"
 
+		$fabric_dependencies$
+
 		sourceSets.main.resources.srcDirs += "${project.rootDir}/src/main/fabric-resources"
 	} else if (mod_brand == 'forge') {
 		forge "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
 
 		forgeRuntimeLibrary project(":$versionlessname$") 
 
+		$forge_dependencies$
+
 		sourceSets.main.resources.srcDirs += "${project.rootDir}/src/main/forge-resources"
 	} else if (mod_brand == 'neoforge') {
 		neoForge "net.neoforged:neoforge:${project.neoforge_version}"
 		forgeRuntimeLibrary project(":$versionlessname$") 
+
+		$neoforge_dependencies$
 
 		sourceSets.main.resources.srcDirs += "${project.rootDir}/src/main/neoforge-resources"
 	}
 
 //    sourceSets.main.java.srcDirs += "${project.rootDir}/UtilityCode/${project.minecraft_version}/src/main/java"
 //	sourceSets.main.resources.srcDirs += "${project.rootDir}/UtilityCode/${project.minecraft_version}/src/main/resources"
+
+	$dependencies$
 
 	inc project(":$versionlessname$") 
 

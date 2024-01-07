@@ -1,6 +1,9 @@
 version: '0.0.2'
 defaultReplacements:
   dependencies: ""
+  fabric_dependencies: ""
+  forge_dependencies: ""
+  neoforge_dependencies: ""
   licensename: "LICENSE"
   author: "tr7zw"
   group: "dev.tr7zw"
