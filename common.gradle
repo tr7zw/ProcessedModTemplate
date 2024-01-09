@@ -1,7 +1,10 @@
+import net.raphimc.javadowngrader.gradle.task.DowngradeJarTask
+
 plugins {
 	id "dev.architectury.loom" version "1.4-SNAPSHOT" apply false
 	id 'com.github.johnrengelman.shadow' version '7.1.2' apply false
 	id "com.diffplug.spotless" version "6.22.0" apply false
+	id "net.raphimc.java-downgrader" version "1.1.1" apply false
 	
     // This dependency is only used to determine the state of the Git working tree so that build artifacts can be
     // more easily identified. This setup is copied from sodium
@@ -12,6 +15,7 @@ apply plugin: 'eclipse'
 apply plugin: "dev.architectury.loom"
 apply plugin: 'com.replaymod.preprocess'
 apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'net.raphimc.java-downgrader'
 
 def mod_brand = (loom.platform.get() as String).toLowerCase()
 assert mod_brand in ['fabric', 'forge', 'neoforge']
@@ -121,6 +125,9 @@ remapJar {
 	doLast {
 		// Delete the shadowJar.archiveFile after remapJar task is executed
 		delete shadowJar.archiveFile
+	}
+	if(mcVersion < 18000) {
+		finalizedBy("java8Jar")
 	}
 }
 
@@ -234,7 +241,11 @@ tasks.withType(JavaCompile) {
 	options.encoding = "UTF-8"
 }
 
-if (mcVersion >= 11800) {
+// remapping the jars later for < 1.18 to Java 8
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
+
+/*if (mcVersion >= 11800) {
 	sourceCompatibility = JavaVersion.VERSION_17
 	targetCompatibility = JavaVersion.VERSION_17
 } else if (mcVersion >= 11700) {
@@ -243,7 +254,7 @@ if (mcVersion >= 11800) {
 } else {
 	sourceCompatibility = JavaVersion.VERSION_1_8
 	targetCompatibility = JavaVersion.VERSION_1_8
-}
+}*/
 
 java {
 	//withSourcesJar()
@@ -275,4 +286,23 @@ def getVersionMetadata() {
 // Function to delete bin directory recursively
 def deleteBinDir(dir) {
     ant.delete(dir: dir, failonerror: false)
+}
+
+tasks.register("java8Jar", DowngradeJarTask) {
+	dependsOn remapJar
+	input = tasks.remapJar.archiveFile.get().asFile
+    outputSuffix = "+java8"
+    compileClassPath = sourceSets.main.compileClasspath
+    copyRuntimeClasses = false
+	doLast {
+		// Delete the remapJar.archiveFile
+		delete remapJar.archiveFile
+		def inputFile = tasks.remapJar.archiveFile.get().asFile
+        def outputDirectory = inputFile.parent
+        def originalFileName = inputFile.getName().substring(0, inputFile.getName().length() - 4);
+
+        // Renaming the generated file to the original name
+        def generatedFile = new File(outputDirectory, "${originalFileName}+java8.jar")
+        generatedFile.renameTo(inputFile)
+	}
 }

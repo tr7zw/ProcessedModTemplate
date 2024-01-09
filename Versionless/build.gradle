@@ -17,5 +17,6 @@ dependencies {
     $dependencies$
 }
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
+// remapping the jars later for <= 1.17.1 to Java 8
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
