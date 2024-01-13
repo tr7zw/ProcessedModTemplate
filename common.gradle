@@ -164,6 +164,7 @@ processResources {
 			neo_version_range: neoforgeVersionRange,
 			fabric_entrypoint   : "$fabric_entrypoint$",
 			fabric_modmenu_entrypoint: "$fabric_modmenu_entrypoint$",
+			fabric_api_name: fabric_api_name,
 			description		 : "$description$",
 			homepage_url		 : "$homepageUrl$",
 			sources_url		 : "$sourcesUrl$",
