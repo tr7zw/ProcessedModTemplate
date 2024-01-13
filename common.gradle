@@ -136,8 +136,8 @@ processResources {
 
 	def neoforgeVersionRange = project.hasProperty('neo_version_range') ? project.neo_version_range : ''
 	def neoforgeLoaderVersion = project.hasProperty('loader_version_range_neoforge') ? project.loader_version_range_neoforge : ''
-	
 	def forgeLoaderVersion = project.hasProperty('loader_version_range_forge') ? project.loader_version_range_forge : ''
+	def fabricApiName = project.hasProperty('fabric_api_name') ? project.fabric_api_name : ''
 
 	def versionsMap = [
 		10809: 1,
@@ -164,7 +164,7 @@ processResources {
 			neo_version_range: neoforgeVersionRange,
 			fabric_entrypoint   : "$fabric_entrypoint$",
 			fabric_modmenu_entrypoint: "$fabric_modmenu_entrypoint$",
-			fabric_api_name: fabric_api_name,
+			fabric_api_name: fabricApiName,
 			description		 : "$description$",
 			homepage_url		 : "$homepageUrl$",
 			sources_url		 : "$sourcesUrl$",
