@@ -70,14 +70,4 @@ public class NMSHelper {
     	//spotless:on
     }
 
-	public static float getZRot(Entity ent) {
-        // spotless:off
-    	//#if MC >= 11700
-    	return ent.getZRot();
-    	//#else
-    	//$$ return ent.zRot;
-    	//#endif
-    	//spotless:on
-    }
-
 }
