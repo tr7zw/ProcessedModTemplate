@@ -12,6 +12,7 @@ defaultReplacements:
   homepageUrl: "https://github.com/tr7zw"
   sourcesUrl: "https://github.com/tr7zw"
   issuesUrl: "https://github.com/tr7zw"
+  mcpublishVersion: "3.3.0"
 customEntries:
   - versions/1.16.5-fabric/gradle.properties
   - versions/1.16.5-forge/gradle.properties
