@@ -181,6 +181,12 @@ processResources {
 
 	from "${project.rootDir}/$licensename$"
 
+	if (mod_brand != 'fabric') {
+		exclude {
+			it.file.name == 'fabric.mod.json'
+		}
+	}
+
 }
 
 sourceSets.each {
