@@ -129,15 +129,16 @@ remapJar {
 		// Delete the shadowJar.archiveFile after remapJar task is executed
 		delete shadowJar.archiveFile
 	}
-	if(mcVersion < 18000) {
+	if(mcVersion < 11800) {
 		finalizedBy("java8Jar")
 	}
 }
 
-if (mod_brand == 'fabric') {
-	test {
+test.onlyIf { mod_brand == 'fabric' && mcVersion >= 11700 }
+compileTestJava.onlyIf { mod_brand == 'fabric' && mcVersion >= 11700 }
+
+test {
 	useJUnitPlatform()
-	}
 }
 
 processResources {
