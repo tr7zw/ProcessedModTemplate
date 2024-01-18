@@ -83,6 +83,9 @@ dependencies {
 		modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
     	modImplementation "maven.modrinth:modmenu:${project.mod_menu_release}"
 
+		testImplementation "net.fabricmc:fabric-loader-junit:${rootProject.fabric_loader_version}"
+		testImplementation 'org.objenesis:objenesis:3.3'
+
 		$fabric_dependencies$
 
 		sourceSets.main.resources.srcDirs += "${project.rootDir}/src/main/fabric-resources"
@@ -128,6 +131,12 @@ remapJar {
 	}
 	if(mcVersion < 18000) {
 		finalizedBy("java8Jar")
+	}
+}
+
+if (mod_brand == 'fabric') {
+	test {
+	useJUnitPlatform()
 	}
 }
 
