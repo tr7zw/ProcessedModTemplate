@@ -134,8 +134,8 @@ remapJar {
 	}
 }
 
-test.onlyIf { mod_brand == 'fabric' && mcVersion >= 11700 }
-compileTestJava.onlyIf { mod_brand == 'fabric' && mcVersion >= 11700 }
+test.onlyIf { mod_brand == 'fabric' && mcVersion >= 11800 }
+compileTestJava.onlyIf { mod_brand == 'fabric' && mcVersion >= 11800 }
 
 test {
 	useJUnitPlatform()
