@@ -21,6 +21,7 @@ public class NMSHelper {
     public static final float PI = (float) Math.PI;
     public static final float HALF_PI = (float) (Math.PI / 2);
     public static final float TWO_PI = (float) (Math.PI * 2);
+	public static final float DEG_TO_RAD = (float) (Math.PI / 180.0);
 
     // spotless:off
 	//#if MC >= 11903
@@ -66,6 +67,26 @@ public class NMSHelper {
     	return ent.getYRot();
     	//#else
     	//$$ return ent.yRot;
+    	//#endif
+    	//spotless:on
+    }
+    
+    public static void setXRot(Entity ent, float xRot) {
+        // spotless:off
+    	//#if MC >= 11700
+    	ent.setXRot(xRot);
+    	//#else
+    	//$$ ent.xRot = xRot;
+    	//#endif
+    	//spotless:on
+    }
+
+    public static void setYRot(Entity ent, float yRot) {
+        // spotless:off
+    	//#if MC >= 11700
+    	ent.setYRot(yRot);
+    	//#else
+    	//$$ ent.yRot = yRot;
     	//#endif
     	//spotless:on
     }
