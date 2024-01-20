@@ -2,17 +2,10 @@ import groovy.json.JsonSlurper
 
 pluginManagement {
     repositories {
-        maven { url "https://maven.fabricmc.net/" }
         maven { url "https://maven.architectury.dev/" }
-        maven { url "https://maven.minecraftforge.net/" }
-        maven { url "https://maven.neoforged.net/releases/" }
-        maven {
-			name = 'Jitpack'
-			url = "https://jitpack.io"
-		}
 		maven {
-            name = "Lenni0451"
-            url "https://maven.lenni0451.net/everything"
+            name = "tr7zw-proxy"
+            url "https://maven.tr7zw.dev/repository/maven-public/"
         }
         gradlePluginPortal()
         mavenCentral()
