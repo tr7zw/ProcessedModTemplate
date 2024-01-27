@@ -29,6 +29,6 @@
         "${fabric_api_name}": "*"
     },
     "breaks": {
-        "tlskincape": "*"
+        "tlskincape": "*"$breaks$
     }
 }
