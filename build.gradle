@@ -1,6 +1,5 @@
 plugins {
 	id 'maven-publish'
-	id "dev.architectury.loom" version "1.5-SNAPSHOT" apply false
 
 	// https://github.com/ReplayMod/preprocessor
 	// https://github.com/Fallen-Breath/preprocessor
@@ -50,6 +49,8 @@ repositories {
 }
 
 preprocess {
+	def mc11202_forge  = createNode('1.12.2-forge' , 1_12_02, 'srg')
+
 	def mc11605_forge  = createNode('1.16.5-forge' , 1_16_05, 'official')
 	def mc11605_fabric = createNode('1.16.5-fabric', 1_16_05, 'official')
 
@@ -81,6 +82,8 @@ preprocess {
 
 	def mc12005_fabric = createNode('1.20.5-fabric', 1_20_05, 'official')
 
+	// 1.12.2
+	mc11202_forge.link(mc11605_forge, null)
 	// 1.16.5
 	mc11605_fabric.link(mc11605_forge, null)
 	mc11701_fabric.link(mc11605_fabric, null)

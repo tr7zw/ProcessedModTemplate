@@ -15,6 +15,7 @@ defaultReplacements:
   mcpublishVersion: "3.3.0"
   breaks: ""
 customEntries:
+  - versions/1.12.2-forge/gradle.properties
   - versions/1.16.5-fabric/gradle.properties
   - versions/1.16.5-forge/gradle.properties
   - versions/1.17.1-fabric/gradle.properties
