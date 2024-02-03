@@ -30,5 +30,10 @@ for (String version : settings.versions) {
 
 	def proj = project(":$version")
 	proj.projectDir = file("versions/$version")
-	proj.buildFileName = "../../common.gradle"
+	// use legacy for 1.12.2
+	if (version == "1.12.2-forge") {
+		proj.buildFileName = "../../legacy.gradle"
+	} else {
+		proj.buildFileName = "../../common.gradle"
+	}
 }

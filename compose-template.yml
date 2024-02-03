@@ -50,6 +50,7 @@ customEntries:
   - versions/1.19.2-fabric/src/main/java/dev/tr7zw/config/CustomConfigScreen.java
   - formatter.xml
   - common.gradle
+  - legacy.gradle
 availableFlags:
   - autopublish
   - modrinth
