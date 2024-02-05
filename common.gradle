@@ -49,8 +49,8 @@ loom {
 		forge.mixinConfigs "${modid}.mixins.json"
 	}
 	
-	if(file("src/main/resources/$id$.accesswidener").exists()){
-		accessWidenerPath = file("src/main/resources/$id$.accesswidener")
+	if(file("${project.rootProject.rootDir}/src/main/resources/$id$.accesswidener").exists()){
+		accessWidenerPath = file("${project.rootProject.rootDir}/src/main/resources/$id$.accesswidener")
 	}
 
 }
