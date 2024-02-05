@@ -11,27 +11,42 @@ plugins {
 tasks.named('assemble').get().dependsOn 'spotlessApply'
 
 spotless {
+
 	java {
-		target '**/*.java'
+		target project.fileTree(project.rootDir) {
+                include '**/*.java'
+               <skipSpotless> exclude '**'</skipSpotless>
+            }
 		eclipse().configFile("${project.rootDir}/formatter.xml")
 		toggleOffOn()
 	}
 	format 'misc', {
-		target '**/*.gitattributes', '**/*.gitignore', '**/*.toml'
-
+		target project.fileTree(project.rootDir) {
+                include '**/*.gitattributes', '**/*.gitignore', '**/*.toml'
+               <skipSpotless> exclude '**'</skipSpotless>
+            }
 		trimTrailingWhitespace()
 		endWithNewline()
 	}
 	yaml {
-		target '**/*.yaml'
+		target project.fileTree(project.rootDir) {
+			include '**/*.yaml'
+			<skipSpotless> exclude '**'</skipSpotless>
+		}
 		jackson()
 	}
 	json {
-		target '**/*.json' 
+		target project.fileTree(project.rootDir) {
+			include '**/*.json' 
+			<skipSpotless> exclude '**'</skipSpotless>
+		}
 		gson()
 	}
 	flexmark {
-		target '**/*.md'
+		target project.fileTree(project.rootDir) {
+			include '**/*.md'
+			<skipSpotless> exclude '**'</skipSpotless>
+		}
 		flexmark()
 	}
 }

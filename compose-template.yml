@@ -58,3 +58,4 @@ availableFlags:
   - publishNeo
   - accesswidener
   - versionless
+  - skipSpotless
