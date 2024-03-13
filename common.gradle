@@ -192,7 +192,7 @@ processResources {
 	]
 	inputs.properties replaceProperties
 
-	filesMatching(['fabric.mod.json', 'META-INF/mods.toml', 'pack.mcmeta']) {
+	filesMatching(['fabric.mod.json', 'META-INF/mods.toml', '**/pack.mcmeta']) {
 		expand replaceProperties + [project: project]
 	}
 
