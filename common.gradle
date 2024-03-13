@@ -115,6 +115,12 @@ dependencies {
 
 }
 
+if (getFile('dependencies.gradle').exists()) {
+    apply from: 'dependencies.gradle'
+} else if (getFile('dependencies.gradle.kts').exists()) {
+    apply from: 'dependencies.gradle.kts'
+}
+
 shadowJar {
 	configurations = [project.configurations.inc]
 	relocate 'dev.tr7zw.util', '$relocationpackage$.util'
@@ -314,4 +320,8 @@ tasks.register("java8Jar", DowngradeJarTask) {
         def generatedFile = new File(outputDirectory, "${originalFileName}+java8.jar")
         generatedFile.renameTo(inputFile)
 	}
+}
+
+def getFile(String relativePath) {
+    return new File(projectDir, relativePath)
 }
