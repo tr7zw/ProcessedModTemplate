@@ -49,9 +49,13 @@ loom {
 	if (mod_brand == 'forge') {
 		forge.mixinConfigs "${modid}.mixins.json"
 	}
-	
+
 	if(file("${project.rootProject.rootDir}/src/main/resources/$id$.accesswidener").exists()){
 		accessWidenerPath = file("${project.rootProject.rootDir}/src/main/resources/$id$.accesswidener")
+	}
+
+	if(file("$projectDir/src/main/resources/$id$.accesswidener").exists()){
+		accessWidenerPath = file("$projectDir/src/main/resources/$id$.accesswidener")
 	}
 
 }
@@ -172,13 +176,13 @@ processResources {
 		12002: 18,
 		12003: 21,
 		12004: 22,
-		12005: 24
+		12005: 31
 	]
 
 	var replaceProperties = [
-			minecraft_version   : minecraft_version, minecraft_version_range_forge: minecraft_version,
-			minecraft_version_range_neoforge         : minecraft_version,
-			minecraft_version_range_fabric: minecraft_version,
+			minecraft_version   : minecraft_version, minecraft_version_range_forge: minecraft_dependency,
+			minecraft_version_range_neoforge         : minecraft_dependency,
+			minecraft_version_range_fabric: minecraft_dependency,
 			loader_version_range_neoforge: neoforgeLoaderVersion,
 			loader_version_range_forge: forgeLoaderVersion,
 			neo_version_range: neoforgeVersionRange,
