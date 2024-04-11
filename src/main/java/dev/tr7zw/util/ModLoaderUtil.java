@@ -7,6 +7,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.screens.Screen;
 //spotless:off
 //#if FABRIC
+import net.minecraft.Util;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.loader.api.FabricLoader;
@@ -103,6 +104,18 @@ public class ModLoaderUtil {
 
     public static void disableDisplayTest() {
         // spotless:off
+        //#if FABRIC
+        try {
+            Class.forName("dev.su5ed.sinytra.connector.mod.ConnectorMod").getCanonicalName();
+            // Fabric mod running under Sinytra Connector, crash right here
+            System.out.println("Detected Sinytra Connector used on a Fabric mod. Closing the game. "
+                    + ModLoaderUtil.class.getPackage().toString());
+            Util.getPlatform().openUri("https://tr7zw.github.io/sinytraconnector/");
+            System.exit(-1);
+        } catch (Exception ex) {
+            // good
+        }
+        //#endif
     	//#if FORGE || NEOFORGE
     	//#if MC <= 11605
     	//$$ ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.DISPLAYTEST,
