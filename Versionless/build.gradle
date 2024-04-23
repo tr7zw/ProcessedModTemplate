@@ -4,6 +4,10 @@ archivesBaseName = rootProject.archives_base_name + "-versionless"
 
 repositories {
 	mavenCentral()
+    maven {
+		name = "tr7zw-proxy"
+		url "https://maven.tr7zw.dev/repository/maven-public/"
+	}
 }
 
 dependencies {
