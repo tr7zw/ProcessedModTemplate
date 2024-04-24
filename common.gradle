@@ -93,7 +93,9 @@ dependencies {
 
 		$fabric_dependencies$
 
-		sourceSets.main.resources.srcDirs += "${project.rootDir}/src/main/fabric-resources"
+		if (!file("${project.rootDir}/src/main/resources/fabric.mod.json").exists()) {
+			sourceSets.main.resources.srcDirs += "${project.rootDir}/src/main/fabric-resources"
+		}
 	} else if (mod_brand == 'forge') {
 		forge "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
 
