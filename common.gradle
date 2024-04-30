@@ -34,7 +34,8 @@ preprocess {
 }
 
 loom {
-	if (mod_brand != 'neoforge') {
+	if (!(mod_brand == 'neoforge' || (mod_brand == 'forge' && mcVersion >= 12005))) {
+		println "Creating refmap for version $mcVersion"
 		mixin {
 			useLegacyMixinAp = true
 			defaultRefmapName = "$id$.refmap.mixins.json"
@@ -151,6 +152,8 @@ remapJar {
 
 test.onlyIf { mod_brand == 'fabric' && mcVersion >= 11800 }
 compileTestJava.onlyIf { mod_brand == 'fabric' && mcVersion >= 11800 }
+// Dirty workaround to get Forge 1.20.6 builds working right now
+remapJar.onlyIf { !(mod_brand == 'forge' && mcVersion >= 12005) }
 
 test {
 	useJUnitPlatform()
@@ -178,7 +181,8 @@ processResources {
 		12002: 18,
 		12003: 21,
 		12004: 22,
-		12005: 32
+		12005: 32,
+		12006: 32
 	]
 
 	var replaceProperties = [
@@ -259,6 +263,7 @@ repositories {
 	maven {
 		url "https://cursemaven.com"
 	}
+	mavenLocal()
 }
 
 tasks.withType(JavaCompile) {
