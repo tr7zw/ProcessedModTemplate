@@ -2,7 +2,7 @@ import groovy.json.JsonSlurper
 
 pluginManagement {
     repositories {
-        maven { url "https://maven.architectury.dev/" }
+        maven { url "https://maven.tr7zw.dev/repository/maven-tmp/" } // https://maven.architectury.dev/ is the official one, using a temporary one for now to get neoforge compiling
 		maven {
             name = "tr7zw-proxy"
             url "https://maven.tr7zw.dev/repository/maven-public/"

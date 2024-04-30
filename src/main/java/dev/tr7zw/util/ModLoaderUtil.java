@@ -45,8 +45,12 @@ import net.fabricmc.loader.api.FabricLoader;
 //$$ import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
 //$$ import net.neoforged.neoforge.common.NeoForge;
 //$$ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-//$$ import net.neoforged.neoforge.event.TickEvent.ClientTickEvent;
+//#if MC >= 12005
+//$$ import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+//#else
 //$$ import net.neoforged.neoforge.client.ConfigScreenHandler.ConfigScreenFactory;
+//$$ import net.neoforged.neoforge.event.TickEvent.ClientTickEvent;
+//#endif
 //#endif
 //spotless:on
 
@@ -71,25 +75,36 @@ public class ModLoaderUtil {
             runnable.run();
         });
     	//#elseif FORGE
-      //$$ MinecraftForge.EVENT_BUS.addListener(new Consumer<ClientTickEvent >() {
-      //$$ 
-      //$$ 	@Override
-      //$$ 	public void accept(ClientTickEvent t) {
-      //$$ 		runnable.run();
-      //$$ 	}
-      //$$ 	
-      //$$ });
-    	//#elseif NEOFORGE
-      //$$  NeoForge.EVENT_BUS.addListener(new Consumer<ClientTickEvent>() {
-      //$$     
-      //$$    	@Override
-      //$$    	public void accept(ClientTickEvent t) {
-      //$$    		runnable.run();
-      //$$     	}
-      //$$     	
-      //$$    });
-    	//#endif
-    	//spotless:on
+        //$$ MinecraftForge.EVENT_BUS.addListener(new Consumer<ClientTickEvent >() {
+        //$$ 
+        //$$ 	@Override
+        //$$ 	public void accept(ClientTickEvent t) {
+        //$$ 		runnable.run();
+        //$$ 	}
+        //$$ 	
+        //$$ });
+        //#elseif NEOFORGE
+            //#if MC >= 12005
+            //$$   NeoForge.EVENT_BUS.addListener(new Consumer<net.neoforged.neoforge.client.event.ClientTickEvent>() {
+            //$$  
+            //$$        @Override
+            //$$       public void accept(net.neoforged.neoforge.client.event.ClientTickEvent t) {
+            //$$               runnable.run();
+            //$$       }
+            //$$  
+            //$$  });
+            //#else
+            //$$  NeoForge.EVENT_BUS.addListener(new Consumer<ClientTickEvent>() {
+            //$$     
+            //$$    	@Override
+            //$$    	public void accept(ClientTickEvent t) {
+            //$$    		runnable.run();
+            //$$     	}
+            //$$     	
+            //$$    });
+            //#endif
+        //#endif
+        //spotless:on
     }
 
     public static boolean isModLoaded(String name) {
@@ -117,15 +132,19 @@ public class ModLoaderUtil {
         }
         //#endif
     	//#if FORGE || NEOFORGE
-    	//#if MC <= 11605
-    	//$$ ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.DISPLAYTEST,
-    	//$$ () -> Pair.of(() -> FMLNetworkConstants.IGNORESERVERONLY, (remote, isServer) -> true));
-    	//#else
-    	//$$        ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class,
-    	//$$                () -> new IExtensionPoint.DisplayTest(
-    	//$$                       () -> ModLoadingContext.get().getActiveContainer().getModInfo().getVersion().toString(),
-    	//$$                        (remote, isServer) -> true));
-    	//#endif
+            //#if MC <= 11605
+            //$$ ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.DISPLAYTEST,
+            //$$ () -> Pair.of(() -> FMLNetworkConstants.IGNORESERVERONLY, (remote, isServer) -> true));
+            //#else
+                //#if MC >= 12005 && NEOFORGE
+                // nothing
+                //#else
+                //$$        ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class,
+                //$$                () -> new IExtensionPoint.DisplayTest(
+                //$$                       () -> ModLoadingContext.get().getActiveContainer().getModInfo().getVersion().toString(),
+                //$$                        (remote, isServer) -> true));
+                //#endif
+            //#endif
     	//#endif
     	//spotless:on
     }
@@ -142,6 +161,10 @@ public class ModLoaderUtil {
     	//$$ -> new ConfigGuiFactory((mc, screen) -> {
     	//$$            return createScreen.apply(screen);
     	//$$        }));
+        //#elseif MC >= 12005 && NEOFORGE
+        //$$ ModLoadingContext.get().registerExtensionPoint(IConfigScreenFactory.class, () -> (mc, screen) -> {
+        //$$     return createScreen.apply(screen);
+        //$$ });
     	//#else
     	//$$ ModLoadingContext.get().registerExtensionPoint(ConfigScreenFactory.class, () -> new ConfigScreenFactory((mc, screen) -> {
     	//$$            return createScreen.apply(screen);
