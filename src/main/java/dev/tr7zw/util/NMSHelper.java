@@ -5,6 +5,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.AbstractClientPlayer;
+
 import com.mojang.authlib.GameProfile;
 //spotless:off
 //#if MC >= 11903
@@ -40,7 +42,7 @@ public class NMSHelper {
     public static final float PI = (float) Math.PI;
     public static final float HALF_PI = (float) (Math.PI / 2);
     public static final float TWO_PI = (float) (Math.PI * 2);
-	public static final float DEG_TO_RAD = (float) (Math.PI / 180.0);
+    public static final float DEG_TO_RAD = (float) (Math.PI / 180.0);
 
     // spotless:off
 	//#if MC >= 11903
@@ -61,9 +63,9 @@ public class NMSHelper {
 	//spotless:on
 
     public static ResourceLocation getResourceLocation(String namespace, String path) {
-	return new ResourceLocation(namespace, path);
+        return new ResourceLocation(namespace, path);
     }
-	
+
     public static Item getItem(ResourceLocation key) {
         // spotless:off
     	//#if MC >= 11903
@@ -93,7 +95,7 @@ public class NMSHelper {
     	//#endif
     	//spotless:on
     }
-    
+
     public static void setXRot(Entity ent, float xRot) {
         // spotless:off
     	//#if MC >= 11700
@@ -112,6 +114,16 @@ public class NMSHelper {
     	//$$ ent.yRot = yRot;
     	//#endif
     	//spotless:on
+    }
+
+    public static ResourceLocation getPlayerSkin(AbstractClientPlayer player) {
+        // spotless:off
+        //#if MC >= 12002
+        return player.getSkin().texture();
+        //#else
+        //$$ return player.getSkinTextureLocation();
+        //#endif
+        //spotless:on
     }
     
     public static ResourceLocation getPlayerSkin(GameProfile gameprofile) {
@@ -135,7 +147,7 @@ public class NMSHelper {
         //#endif
         //spotless:on
     }
-    
+
     public static GameProfile getGameProfile(ItemStack itemStack) {
         // spotless:off 
         //#if MC >= 12005
