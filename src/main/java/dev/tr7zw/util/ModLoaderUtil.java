@@ -12,6 +12,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.loader.api.FabricLoader;
 //#elseif FORGE
+//$$ import net.minecraftforge.fml.ModList;
 //$$ import net.minecraft.client.Minecraft;
 //$$ import org.apache.commons.lang3.ArrayUtils;
 //$$ import net.minecraftforge.common.MinecraftForge;
@@ -36,6 +37,7 @@ import net.fabricmc.loader.api.FabricLoader;
 //$$ import net.minecraftforge.client.ConfigScreenHandler.ConfigScreenFactory;
 //#endif
 //#elseif NEOFORGE
+//$$ import net.neoforged.fml.ModList;
 //$$ import net.minecraft.client.Minecraft;
 //$$ import org.apache.commons.lang3.ArrayUtils;
 //$$ import java.util.function.Consumer;
@@ -109,12 +111,12 @@ public class ModLoaderUtil {
 
     public static boolean isModLoaded(String name) {
         // spotless:off
-    	//#if FABRIC
+        //#if FABRIC
         return FabricLoader.getInstance().isModLoaded(name);
         //#else
-        //$$ return false;
-    	//#endif
-    	//spotless:on
+        //$$ return ModList.get().isLoaded(name);
+        //#endif
+        //spotless:on
     }
 
     public static void disableDisplayTest() {
