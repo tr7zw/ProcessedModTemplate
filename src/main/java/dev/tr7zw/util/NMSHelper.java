@@ -63,7 +63,23 @@ public class NMSHelper {
 	//spotless:on
 
     public static ResourceLocation getResourceLocation(String namespace, String path) {
-        return new ResourceLocation(namespace, path);
+        //spotless:off
+        //#if MC >= 12100
+        return ResourceLocation.fromNamespaceAndPath(namespace, path);
+        //#else
+        //$$ return new ResourceLocation(namespace, path);
+        //#endif
+        //spotless:on
+    }
+    
+    public static ResourceLocation getResourceLocation(String key) {
+        //spotless:off
+        //#if MC >= 12100
+        return ResourceLocation.parse(key);
+        //#else
+        //$$ return new ResourceLocation(key);
+        //#endif
+        //spotless:on
     }
 
     public static Item getItem(ResourceLocation key) {

@@ -25,8 +25,10 @@ import net.minecraft.network.chat.Component;
 //spotless:off 
 //#if MC <= 11904
 //$$ import com.mojang.blaze3d.vertex.PoseStack;
-//#elseif MC >= 12005
-import net.minecraft.client.gui.screens.OptionsSubScreen;
+//#elseif MC <= 12006
+//$$ import net.minecraft.client.gui.screens.OptionsSubScreen;
+//#else
+import net.minecraft.client.gui.screens.options.OptionsSubScreen;
 //#endif
 //spotless:on
 
@@ -74,8 +76,10 @@ public abstract class CustomConfigScreen extends OptionsSubScreen {
         //$$ this.list = new OptionsList(this.minecraft, this.width, this.height, 32, this.height - 32, 25);
         //#elseif MC <= 12004
         //$$ this.list = new OptionsList(this.minecraft, this.width, this.height - 64, 32, 25);
+        //#elseif MC <= 12006
+        //$$ this.list = new OptionsList(this.minecraft, this.width, this.height, this);
         //#else
-        this.list = new OptionsList(this.minecraft, this.width, this.height, this);
+        this.list = new OptionsList(this.minecraft, this.width, this);
         //#endif
         // spotless:on
         this.addWidget(this.list);

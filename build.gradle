@@ -83,6 +83,10 @@ preprocess {
 	def mc12006_forge = createNode('1.20.6-forge', 1_20_06, 'official')
 	def mc12006_neoforge  = createNode('1.20.6-neoforge' , 1_20_06, 'official')
 
+	def mc12100_fabric = createNode('1.21-fabric', 1_21_00, 'official')
+	def mc12100_forge = createNode('1.21-forge', 1_21_00, 'official')
+	def mc12100_neoforge  = createNode('1.21-neoforge' , 1_21_00, 'official')
+
 	// 1.16.5
 	mc11605_fabric.link(mc11605_forge, null)
 	mc11701_fabric.link(mc11605_fabric, null)
@@ -113,9 +117,13 @@ preprocess {
 	mc12004_fabric.link(mc12004_forge, null)
 	mc12004_fabric.link(mc12004_neoforge, null)
 	// 1.20.6
-	// fabric 1.20.6 is technically here
+	mc12100_fabric.link(mc12006_fabric, null)
 	mc12006_fabric.link(mc12006_forge, null)
 	mc12006_fabric.link(mc12006_neoforge, null)
+	// 1.21
+	// fabric 1.21 is technically here
+	mc12100_fabric.link(mc12100_forge, null)
+	mc12100_fabric.link(mc12100_neoforge, null)
 }
 
 tasks.register('buildAndGather') {
