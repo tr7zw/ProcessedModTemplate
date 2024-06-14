@@ -46,13 +46,13 @@ public abstract class CustomConfigScreen extends OptionsSubScreen {
     private Button reset;
 
     public CustomConfigScreen(Screen lastScreen, String title) {
-      //spotless:off
+        // spotless:off
       //#if MC <= 12004
       //$$ super(Component.translatable(title));
       //#else
         super(lastScreen, Minecraft.getInstance().options, ComponentProvider.translatable(title));
       //#endif
-      //spotless:on 
+      //spotless:on
         this.lastScreen = lastScreen;
     }
 
@@ -70,6 +70,14 @@ public abstract class CustomConfigScreen extends OptionsSubScreen {
         return list;
     }
 
+    // spotless:off
+    //#if MC >= 12100
+    @Override
+    protected void addOptions() {
+    }
+    //#endif
+    //spotless:on
+    
     protected void init() {
         // spotless:off
         //#if MC <= 12002
