@@ -8,16 +8,20 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 
 import com.mojang.authlib.GameProfile;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+
 //spotless:off
 //#if MC >= 11903
 import net.minecraft.core.registries.BuiltInRegistries;
 
+import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
 import com.mojang.math.Axis;
 //#else
 //$$ import net.minecraft.core.Registry;
 //$$ import com.mojang.math.Vector3f;
+//$$ import com.mojang.math.Matrix4f;
 //#endif
 // Skins
 //#if MC >= 12002
@@ -63,7 +67,7 @@ public class NMSHelper {
 	//spotless:on
 
     public static ResourceLocation getResourceLocation(String namespace, String path) {
-        //spotless:off
+        // spotless:off
         //#if MC >= 12100
         return ResourceLocation.fromNamespaceAndPath(namespace, path);
         //#else
@@ -71,9 +75,9 @@ public class NMSHelper {
         //#endif
         //spotless:on
     }
-    
+
     public static ResourceLocation getResourceLocation(String key) {
-        //spotless:off
+        // spotless:off
         //#if MC >= 12100
         return ResourceLocation.parse(key);
         //#else
@@ -141,7 +145,7 @@ public class NMSHelper {
         //#endif
         //spotless:on
     }
-    
+
     public static ResourceLocation getPlayerSkin(GameProfile gameprofile) {
         // spotless:off 
         //#if MC >= 12002
@@ -198,6 +202,34 @@ public class NMSHelper {
         //$$     }
         //$$ }
         //$$ return null;
+        //#endif
+        //spotless:on
+    }
+
+    public static void addVertex(VertexConsumer cons, Matrix4f matrix4f, float x, float y, float z, int r, int g, int b,
+            int a, int u, int v, int lightmapUV) {
+        addVertex(cons, matrix4f, x, y, z, r, g, b, a, u, v, lightmapUV & 65535, lightmapUV >> 16 & 65535);
+    }
+
+    public static void addVertex(VertexConsumer cons, Matrix4f matrix4f, float x, float y, float z, int r, int g, int b,
+            int a, int u, int v, int u2, int v2) {
+        // spotless:off
+        //#if MC >= 12100
+        cons.addVertex(matrix4f, x, y, z).setColor(r, g, b, a).setUv(u, v).setUv2(u2, v2);
+        //#else
+        //$$ cons.vertex(matrix4f, x, y, z).color(r, g, b, a).uv(u, v).uv2(u2, v2)
+        //$$ .endVertex();
+        //#endif
+        //spotless:on
+    }
+
+    public static void addVertex(VertexConsumer cons, Matrix4f matrix4f, float x, float y, float z, int r, int g, int b,
+            int a, int u, int v) {
+        // spotless:off
+        //#if MC >= 12100
+        cons.addVertex(matrix4f, x, y, z).setColor(r, g, b, a).setUv(u, v);
+        //#else
+        //$$ cons.vertex(matrix4f, x, y, z).color(r, g, b, a).uv(u, v).endVertex();
         //#endif
         //spotless:on
     }
