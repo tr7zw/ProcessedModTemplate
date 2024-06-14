@@ -44,7 +44,6 @@ import net.fabricmc.loader.api.FabricLoader;
 //$$ import net.neoforged.fml.ModLoadingContext;
 //$$ import net.neoforged.fml.IExtensionPoint;
 //$$ import net.neoforged.bus.api.Event;
-//$$ import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
 //$$ import net.neoforged.neoforge.common.NeoForge;
 //$$ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 //#if MC >= 12005
@@ -179,7 +178,11 @@ public class ModLoaderUtil {
     public static void registerClientSetupListener(Runnable runnable) {
         // spotless:off
     	//#if FORGE || NEOFORGE
-      //$$ FMLJavaModLoadingContext.get().getModEventBus().addListener(new Consumer<FMLClientSetupEvent>() {
+        //#if NEOFORGE
+        //$$ ModLoadingContext.get().getActiveContainer().getEventBus().addListener(new Consumer<FMLClientSetupEvent>() {
+        //#else
+        //$$ FMLJavaModLoadingContext.get().getModEventBus().addListener(new Consumer<FMLClientSetupEvent>() {
+        //#endif
       //$$ 
       //$$ 	@Override
       //$$ 	public void accept(FMLClientSetupEvent t) {
