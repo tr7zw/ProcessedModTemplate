@@ -76,20 +76,21 @@ public class ModLoaderUtil {
             runnable.run();
         });
     	//#elseif FORGE
-        //$$ MinecraftForge.EVENT_BUS.addListener(new Consumer<ClientTickEvent >() {
+        //$$ MinecraftForge.EVENT_BUS.addListener(new Consumer<ClientTickEvent>() {
         //$$ 
         //$$ 	@Override
         //$$ 	public void accept(ClientTickEvent t) {
+        //$$    if (t.phase != ClientTickEvent.Phase.START) return;
         //$$ 		runnable.run();
         //$$ 	}
         //$$ 	
         //$$ });
         //#elseif NEOFORGE
             //#if MC >= 12005
-            //$$   NeoForge.EVENT_BUS.addListener(new Consumer<net.neoforged.neoforge.client.event.ClientTickEvent>() {
+            //$$   NeoForge.EVENT_BUS.addListener(new Consumer<net.neoforged.neoforge.client.event.ClientTickEvent.Pre>() {
             //$$  
             //$$        @Override
-            //$$       public void accept(net.neoforged.neoforge.client.event.ClientTickEvent t) {
+            //$$       public void accept(net.neoforged.neoforge.client.event.ClientTickEvent.Pre t) {
             //$$               runnable.run();
             //$$       }
             //$$  

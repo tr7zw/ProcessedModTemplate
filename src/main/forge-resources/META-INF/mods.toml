@@ -1,6 +1,7 @@
 modLoader="javafml"
 loaderVersion="${loader_version_range_forge}"
 issueTrackerURL="${issues_url}"
+clientSideOnly=true
 
 license="${license_name}"
 [[mods]]
