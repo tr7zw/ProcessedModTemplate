@@ -206,30 +206,42 @@ public class NMSHelper {
         //spotless:on
     }
 
-    public static void addVertex(VertexConsumer cons, Matrix4f matrix4f, float x, float y, float z, int r, int g, int b,
-            int a, int u, int v, int lightmapUV) {
-        addVertex(cons, matrix4f, x, y, z, r, g, b, a, u, v, lightmapUV & 65535, lightmapUV >> 16 & 65535);
+    public static void addVertex(VertexConsumer cons, Matrix4f matrix4f, float x, float y, float z, float u, float v, int lightmapUV) {
+        addVertex(cons, matrix4f, x, y, z, u, v, lightmapUV & 65535, lightmapUV >> 16 & 65535);
     }
 
-    public static void addVertex(VertexConsumer cons, Matrix4f matrix4f, float x, float y, float z, int r, int g, int b,
-            int a, int u, int v, int u2, int v2) {
+    public static void addVertex(VertexConsumer cons, Matrix4f matrix4f, float x, float y, float z, float u, float v, int u2, int v2) {
         // spotless:off
         //#if MC >= 12100
-        cons.addVertex(matrix4f, x, y, z).setColor(r, g, b, a).setUv(u, v).setUv2(u2, v2);
+        cons.addVertex(matrix4f, x, y, z).setColor(255, 255, 255, 255).setUv(u, v).setUv2(u2, v2);
         //#else
-        //$$ cons.vertex(matrix4f, x, y, z).color(r, g, b, a).uv(u, v).uv2(u2, v2)
+        //$$ cons.vertex(matrix4f, x, y, z).color(1f, 1f, 1f, 1f).uv(u, v).uv2(u2, v2)
         //$$ .endVertex();
         //#endif
         //spotless:on
     }
 
-    public static void addVertex(VertexConsumer cons, Matrix4f matrix4f, float x, float y, float z, int r, int g, int b,
-            int a, int u, int v) {
+    public static void addVertex(VertexConsumer cons, Matrix4f matrix4f, float x, float y, float z, float u, float v) {
         // spotless:off
         //#if MC >= 12100
-        cons.addVertex(matrix4f, x, y, z).setColor(r, g, b, a).setUv(u, v);
+        cons.addVertex(matrix4f, x, y, z).setColor(255, 255, 255, 255).setUv(u, v);
         //#else
-        //$$ cons.vertex(matrix4f, x, y, z).color(r, g, b, a).uv(u, v).endVertex();
+        //$$ cons.vertex(matrix4f, x, y, z).color(1f, 1f, 1f, 1f).uv(u, v).endVertex();
+        //#endif
+        //spotless:on
+    }
+    
+    public static void addVertex(VertexConsumer cons, Matrix4f matrix4f, float x, float y, float z, float u, float v, int overlay, int lightmapUV, int nx, int ny, int nz) {
+        addVertex(cons, matrix4f, x, y, z, u, v, overlay, lightmapUV & 65535, lightmapUV >> 16 & 65535, nx, ny, nz);
+    }
+    
+    public static void addVertex(VertexConsumer cons, Matrix4f matrix4f, float x, float y, float z, float u, float v, int overlay, int u2, int v2, int nx, int ny, int nz) {
+        // spotless:off
+        //#if MC >= 12100
+        cons.addVertex(matrix4f, x, y, z).setColor(255, 255, 255, 255).setUv(u, v).setUv2(u2, v2).setOverlay(overlay).setNormal(nx, ny, nz);
+        //#else
+        //$$ cons.vertex(matrix4f, x, y, z).color(1f, 1f, 1f, 1f).uv(u, v).uv2(u2, v2).overlayCoords(overlay).normal(nx, ny, nz)
+        //$$ .endVertex();
         //#endif
         //spotless:on
     }
