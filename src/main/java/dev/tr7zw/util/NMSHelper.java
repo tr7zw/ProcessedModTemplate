@@ -240,7 +240,7 @@ public class NMSHelper {
         //#if MC >= 12100
         cons.addVertex(matrix4f, x, y, z).setColor(255, 255, 255, 255).setUv(u, v).setUv2(u2, v2).setOverlay(overlay).setNormal(nx, ny, nz);
         //#else
-        //$$ cons.vertex(matrix4f, x, y, z).color(1f, 1f, 1f, 1f).uv(u, v).uv2(u2, v2).overlayCoords(overlay).normal(nx, ny, nz)
+        //$$ cons.vertex(matrix4f, x, y, z).color(1f, 1f, 1f, 1f).uv(u, v).overlayCoords(overlay).uv2(u2, v2).normal(nx, ny, nz)
         //$$ .endVertex();
         //#endif
         //spotless:on
