@@ -89,7 +89,11 @@ dependencies {
 		modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
 
 		modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
-    	modImplementation "maven.modrinth:modmenu:${project.mod_menu_release}"
+		if(project.hasProperty('mod_menu_compile_only')) {
+    		modCompileOnly "maven.modrinth:modmenu:${project.mod_menu_release}"
+		} else {
+			modImplementation "maven.modrinth:modmenu:${project.mod_menu_release}"
+		}
 
 		testImplementation "net.fabricmc:fabric-loader-junit:${rootProject.fabric_loader_version}"
 		testImplementation 'org.objenesis:objenesis:3.4'
