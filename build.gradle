@@ -1,6 +1,6 @@
 plugins {
 	id 'maven-publish'
-	id "dev.architectury.loom" version "1.6-SNAPSHOT" apply false
+	id "dev.architectury.loom" version "1.7-SNAPSHOT" apply false
 
 	// https://github.com/ReplayMod/preprocessor
 	// https://github.com/Fallen-Breath/preprocessor
@@ -87,6 +87,8 @@ preprocess {
 	def mc12100_forge = createNode('1.21-forge', 1_21_00, 'official')
 	def mc12100_neoforge  = createNode('1.21-neoforge' , 1_21_00, 'official')
 
+	def mc12102_fabric = createNode('1.21.2-fabric', 1_21_02, 'official')
+
 	// 1.16.5
 	mc11605_fabric.link(mc11605_forge, null)
 	mc11701_fabric.link(mc11605_fabric, null)
@@ -121,9 +123,11 @@ preprocess {
 	mc12006_fabric.link(mc12006_forge, null)
 	mc12006_fabric.link(mc12006_neoforge, null)
 	// 1.21
-	// fabric 1.21 is technically here
+	mc12102_fabric.link(mc12100_fabric, null)
 	mc12100_fabric.link(mc12100_forge, null)
 	mc12100_fabric.link(mc12100_neoforge, null)
+	// 1.21.2
+	// fabric 1.21.2 is technically here
 }
 
 tasks.register('buildAndGather') {
