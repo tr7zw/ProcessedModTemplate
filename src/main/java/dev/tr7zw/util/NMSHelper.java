@@ -4,6 +4,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 
@@ -88,13 +89,16 @@ public class NMSHelper {
 
     public static Item getItem(ResourceLocation key) {
         // spotless:off
-    	//#if MC >= 11903
-        return BuiltInRegistries.ITEM.get(key);
-		//#else
-		//$$ return Registry.ITEM.get(key);
-		//#endif
-		//spotless:on
+        //#if MC >= 12102
+        return BuiltInRegistries.ITEM.get(key).map(net.minecraft.core.Holder.Reference::value).orElse(Items.AIR);
+    	//#elseif MC >= 11903
+        //$$ return BuiltInRegistries.ITEM.get(key);
+        //#else
+        //$$ return Registry.ITEM.get(key);
+        //#endif
+        //spotless:on
     }
+
 
     public static float getXRot(Entity ent) {
         // spotless:off

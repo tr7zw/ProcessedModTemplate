@@ -2,7 +2,7 @@ import net.raphimc.javadowngrader.gradle.task.DowngradeJarTask
 import org.objectweb.asm.Opcodes
 
 plugins {
-	id "dev.architectury.loom" version "1.6-SNAPSHOT" apply false
+	id "dev.architectury.loom" version "1.7-SNAPSHOT" apply false
 	id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
 	id "com.diffplug.spotless" version "6.22.0" apply false
 	id "net.raphimc.java-downgrader" version "1.1.2-SNAPSHOT" apply false
@@ -70,27 +70,33 @@ dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings loom.layered() {
 		officialMojangMappings()
-		if (mcVersion >= 12004) {
+		if (mcVersion >= 12100) {
+			parchment("org.parchmentmc.data:parchment-${rootProject.parchment_mc_version_21}:${rootProject.parchment_version_21}@zip")
+		} else if (mcVersion >= 12004) {
 			parchment("org.parchmentmc.data:parchment-${rootProject.parchment_mc_version_20_4}:${rootProject.parchment_version_20_4}@zip")
 		} else if(mcVersion >= 12002) {
 			parchment("org.parchmentmc.data:parchment-${rootProject.parchment_mc_version_20_2}:${rootProject.parchment_version_20_2}@zip")
 		}
 	}
 
-	compileOnly 'org.projectlombok:lombok:1.18.32'
-	annotationProcessor 'org.projectlombok:lombok:1.18.32'
+	compileOnly 'org.projectlombok:lombok:1.18.34'
+	annotationProcessor 'org.projectlombok:lombok:1.18.34'
 	
-	testCompileOnly 'org.projectlombok:lombok:1.18.32'
-	testAnnotationProcessor 'org.projectlombok:lombok:1.18.32'
+	testCompileOnly 'org.projectlombok:lombok:1.18.34'
+	testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
 
 	if (mod_brand == 'fabric') {
 		modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
 
 		modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
-    	modImplementation "maven.modrinth:modmenu:${project.mod_menu_release}"
+		if(project.hasProperty('mod_menu_compile_only')) {
+    		modCompileOnly "maven.modrinth:modmenu:${project.mod_menu_release}"
+		} else {
+			modImplementation "maven.modrinth:modmenu:${project.mod_menu_release}"
+		}
 
 		testImplementation "net.fabricmc:fabric-loader-junit:${rootProject.fabric_loader_version}"
-		testImplementation 'org.objenesis:objenesis:3.3'
+		testImplementation 'org.objenesis:objenesis:3.4'
 
 		$fabric_dependencies$
 
@@ -152,8 +158,6 @@ remapJar {
 
 test.onlyIf { mod_brand == 'fabric' && mcVersion >= 11800 }
 compileTestJava.onlyIf { mod_brand == 'fabric' && mcVersion >= 11800 }
-// Dirty workaround to get Forge 1.20.6 builds working right now
-remapJar.onlyIf { !(mod_brand == 'forge' && mcVersion >= 12005) }
 
 test {
 	useJUnitPlatform()
@@ -183,7 +187,8 @@ processResources {
 		12004: 22,
 		12005: 32,
 		12006: 32,
-		12100: 34
+		12100: 34,
+		12102: 41
 	]
 
 	var replaceProperties = [
