@@ -104,7 +104,9 @@ public abstract class CustomConfigScreen extends Screen {
         drawCenteredString(poseStack, this.font, this.title, this.width / 2, 20, 16777215);
         super.render(poseStack, i, j, f);
         List<FormattedCharSequence> list = tooltipAt(this.list, i, j);
-        this.renderTooltip(poseStack, list, i, j);
+        if (list != null) {
+            this.renderTooltip(poseStack, list, i, j);
+        }
     }
 
     @SuppressWarnings("resource")
