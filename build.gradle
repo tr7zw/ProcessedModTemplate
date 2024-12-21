@@ -1,11 +1,11 @@
 plugins {
 	id 'maven-publish'
-	id "dev.architectury.loom" version "1.7-SNAPSHOT" apply false
+	id "dev.architectury.loom" version "1.9-SNAPSHOT" apply false
 
 	// https://github.com/ReplayMod/preprocessor
 	// https://github.com/Fallen-Breath/preprocessor
 	id 'com.replaymod.preprocess' version '20c7ec554a'
-	id "com.diffplug.spotless" version "6.22.0"
+	id "com.diffplug.spotless" version "7.0.0.BETA4"
 }
 
 tasks.named('assemble').get().dependsOn 'spotlessApply'
