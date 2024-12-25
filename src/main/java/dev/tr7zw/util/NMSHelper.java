@@ -7,11 +7,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.network.chat.Component;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
-//spotless:off
 //#if MC >= 11903
 import net.minecraft.core.registries.BuiltInRegistries;
 
@@ -40,16 +40,15 @@ import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.component.ResolvableProfile;
 //#endif
-//spotless:on
 
 public class NMSHelper {
 
+    private final static Minecraft MC = Minecraft.getInstance();
     public static final float PI = (float) Math.PI;
     public static final float HALF_PI = (float) (Math.PI / 2);
     public static final float TWO_PI = (float) (Math.PI * 2);
     public static final float DEG_TO_RAD = (float) (Math.PI / 180.0);
 
-    // spotless:off
 	//#if MC >= 11903
 	public static Axis XN = f -> new Quaternionf().rotationX(-f);
 	public static Axis XP = f -> new Quaternionf().rotationX(f);
@@ -65,30 +64,24 @@ public class NMSHelper {
 	//$$ public static Vector3f ZN = new Vector3f(0.0F, 0.0F, -1.0F);
 	//$$ public static Vector3f ZP = new Vector3f(0.0F, 0.0F, 1.0F);
 	//#endif
-	//spotless:on
 
     public static ResourceLocation getResourceLocation(String namespace, String path) {
-        // spotless:off
         //#if MC >= 12100
         return ResourceLocation.fromNamespaceAndPath(namespace, path);
         //#else
         //$$ return new ResourceLocation(namespace, path);
         //#endif
-        //spotless:on
     }
 
     public static ResourceLocation getResourceLocation(String key) {
-        // spotless:off
         //#if MC >= 12100
         return ResourceLocation.parse(key);
         //#else
         //$$ return new ResourceLocation(key);
         //#endif
-        //spotless:on
     }
 
     public static Item getItem(ResourceLocation key) {
-        // spotless:off
         //#if MC >= 12102
         return BuiltInRegistries.ITEM.get(key).map(net.minecraft.core.Holder.Reference::value).orElse(Items.AIR);
     	//#elseif MC >= 11903
@@ -96,62 +89,50 @@ public class NMSHelper {
         //#else
         //$$ return Registry.ITEM.get(key);
         //#endif
-        //spotless:on
     }
 
 
     public static float getXRot(Entity ent) {
-        // spotless:off
     	//#if MC >= 11700
     	return ent.getXRot();
     	//#else
     	//$$ return ent.xRot;
     	//#endif
-    	//spotless:on
     }
 
     public static float getYRot(Entity ent) {
-        // spotless:off
     	//#if MC >= 11700
     	return ent.getYRot();
     	//#else
     	//$$ return ent.yRot;
     	//#endif
-    	//spotless:on
     }
 
     public static void setXRot(Entity ent, float xRot) {
-        // spotless:off
     	//#if MC >= 11700
     	ent.setXRot(xRot);
     	//#else
     	//$$ ent.xRot = xRot;
     	//#endif
-    	//spotless:on
     }
 
     public static void setYRot(Entity ent, float yRot) {
-        // spotless:off
     	//#if MC >= 11700
     	ent.setYRot(yRot);
     	//#else
     	//$$ ent.yRot = yRot;
     	//#endif
-    	//spotless:on
     }
 
     public static ResourceLocation getPlayerSkin(AbstractClientPlayer player) {
-        // spotless:off
         //#if MC >= 12002
         return player.getSkin().texture();
         //#else
         //$$ return player.getSkinTextureLocation();
         //#endif
-        //spotless:on
     }
 
     public static ResourceLocation getPlayerSkin(GameProfile gameprofile) {
-        // spotless:off 
         //#if MC >= 12002
         PlayerSkin playerSkin = Minecraft.getInstance().getSkinManager().getInsecureSkin(gameprofile);
         if (playerSkin.textureUrl() == null) {
@@ -169,11 +150,17 @@ public class NMSHelper {
         //$$          MinecraftProfileTexture.Type.SKIN);
         //$$  return resourceLocation;
         //#endif
-        //spotless:on
+    }
+
+    public static ResourceLocation getPlayerCape(AbstractClientPlayer player) {
+        //#if MC >= 12002
+        return player.getSkin().capeTexture();
+        //#else
+        //$$ return player.getCloakTextureLocation();
+        //#endif
     }
 
     public static GameProfile getGameProfile(ItemStack itemStack) {
-        // spotless:off 
         //#if MC >= 12005
         if(itemStack.getComponents().has(DataComponents.CUSTOM_MODEL_DATA)) {
             return null;
@@ -207,7 +194,6 @@ public class NMSHelper {
         //$$ }
         //$$ return null;
         //#endif
-        //spotless:on
     }
 
     public static void addVertex(VertexConsumer cons, Matrix4f matrix4f, float x, float y, float z, float u, float v, int lightmapUV) {
@@ -215,24 +201,20 @@ public class NMSHelper {
     }
 
     public static void addVertex(VertexConsumer cons, Matrix4f matrix4f, float x, float y, float z, float u, float v, int u2, int v2) {
-        // spotless:off
         //#if MC >= 12100
         cons.addVertex(matrix4f, x, y, z).setColor(255, 255, 255, 255).setUv(u, v).setUv2(u2, v2);
         //#else
         //$$ cons.vertex(matrix4f, x, y, z).color(1f, 1f, 1f, 1f).uv(u, v).uv2(u2, v2)
         //$$ .endVertex();
         //#endif
-        //spotless:on
     }
 
     public static void addVertex(VertexConsumer cons, Matrix4f matrix4f, float x, float y, float z, float u, float v) {
-        // spotless:off
         //#if MC >= 12100
         cons.addVertex(matrix4f, x, y, z).setColor(255, 255, 255, 255).setUv(u, v);
         //#else
         //$$ cons.vertex(matrix4f, x, y, z).color(1f, 1f, 1f, 1f).uv(u, v).endVertex();
         //#endif
-        //spotless:on
     }
     
     public static void addVertex(VertexConsumer cons, Matrix4f matrix4f, float x, float y, float z, float u, float v, int overlay, int lightmapUV, int nx, int ny, int nz) {
@@ -240,14 +222,42 @@ public class NMSHelper {
     }
     
     public static void addVertex(VertexConsumer cons, Matrix4f matrix4f, float x, float y, float z, float u, float v, int overlay, int u2, int v2, int nx, int ny, int nz) {
-        // spotless:off
         //#if MC >= 12100
         cons.addVertex(matrix4f, x, y, z).setColor(255, 255, 255, 255).setUv(u, v).setUv2(u2, v2).setOverlay(overlay).setNormal(nx, ny, nz);
         //#else
         //$$ cons.vertex(matrix4f, x, y, z).color(1f, 1f, 1f, 1f).uv(u, v).overlayCoords(overlay).uv2(u2, v2).normal(nx, ny, nz)
         //$$ .endVertex();
         //#endif
-        //spotless:on
+    }
+
+    public static void sendChatMessage(Component message) {
+        //#if MC < 11900
+        //$$ if (MC.player != null)
+        //$$ MC.player.sendMessage(message, null);
+        //#elseif MC <= 12101
+        //$$ if (MC.player != null)
+        //$$ MC.player.sendSystemMessage(message);
+        //#else
+        MC.getChatListener().handleSystemMessage(message, false);
+        //#endif
+    }
+
+    public static boolean isSame(ItemStack a, ItemStack b) {
+        //#if MC < 11700
+        //$$return ItemStack.isSame(a, b);
+        //#elseif MC <= 12004
+        //$$ return ItemStack.isSameItemSameTags(a, b);
+        //#else
+        return ItemStack.isSameItemSameComponents(a, b);
+        //#endif
+    }
+
+    public static boolean hasCustomName(ItemStack stack) {
+        //#if MC <= 12004
+        //$$ return stack.hasCustomHoverName();
+        //#else
+        return stack.has(net.minecraft.core.component.DataComponents.CUSTOM_NAME);
+        //#endif
     }
 
 }
