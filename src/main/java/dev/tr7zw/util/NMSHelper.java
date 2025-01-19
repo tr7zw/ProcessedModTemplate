@@ -217,11 +217,11 @@ public class NMSHelper {
         //#endif
     }
     
-    public static void addVertex(VertexConsumer cons, Matrix4f matrix4f, float x, float y, float z, float u, float v, int overlay, int lightmapUV, int nx, int ny, int nz) {
+    public static void addVertex(VertexConsumer cons, Matrix4f matrix4f, float x, float y, float z, float u, float v, int overlay, int lightmapUV, float nx, float ny, float nz) {
         addVertex(cons, matrix4f, x, y, z, u, v, overlay, lightmapUV & 65535, lightmapUV >> 16 & 65535, nx, ny, nz);
     }
     
-    public static void addVertex(VertexConsumer cons, Matrix4f matrix4f, float x, float y, float z, float u, float v, int overlay, int u2, int v2, int nx, int ny, int nz) {
+    public static void addVertex(VertexConsumer cons, Matrix4f matrix4f, float x, float y, float z, float u, float v, int overlay, int u2, int v2, float nx, float ny, float nz) {
         //#if MC >= 12100
         cons.addVertex(matrix4f, x, y, z).setColor(255, 255, 255, 255).setUv(u, v).setUv2(u2, v2).setOverlay(overlay).setNormal(nx, ny, nz);
         //#else
