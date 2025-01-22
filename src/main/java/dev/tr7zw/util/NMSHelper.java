@@ -153,11 +153,17 @@ public class NMSHelper {
     }
 
     public static ResourceLocation getPlayerCape(AbstractClientPlayer player) {
-        //#if MC >= 12002
-        return player.getSkin().capeTexture();
-        //#else
-        //$$ return player.getCloakTextureLocation();
-        //#endif
+        try {
+            //#if MC >= 12002
+            return player.getSkin().capeTexture();
+            //#else
+            //$$ return player.getCloakTextureLocation();
+            //#endif
+        } catch (NullPointerException ignored) {
+            // Broken Oculus + cape modifying mods cause NPE by rendering before the player is setup and are not nullchecking
+            // https://github.com/tr7zw/WaveyCapes/issues/86
+            return null;
+        }
     }
 
     public static GameProfile getGameProfile(ItemStack itemStack) {
