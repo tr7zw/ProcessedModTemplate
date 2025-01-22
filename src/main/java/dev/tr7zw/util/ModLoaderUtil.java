@@ -5,7 +5,6 @@ import java.util.function.Function;
 import lombok.experimental.UtilityClass;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.screens.Screen;
-//spotless:off
 //#if FABRIC
 import net.minecraft.Util;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -53,13 +52,11 @@ import net.fabricmc.loader.api.FabricLoader;
 //$$ import net.neoforged.neoforge.event.TickEvent.ClientTickEvent;
 //#endif
 //#endif
-//spotless:on
 
 @UtilityClass
 public class ModLoaderUtil {
 
     public static void registerKeybind(KeyMapping keyBinding) {
-        // spotless:off
     	//#if FABRIC
     	KeyBindingHelper.registerKeyBinding(keyBinding);
     	//#elseif FORGE || NEOFORGE
@@ -70,7 +67,6 @@ public class ModLoaderUtil {
     }
 
     public static void registerClientTickListener(Runnable runnable) {
-        // spotless:off
     	//#if FABRIC
         ClientTickEvents.END_CLIENT_TICK.register(e -> {
             runnable.run();
@@ -106,21 +102,17 @@ public class ModLoaderUtil {
             //$$    });
             //#endif
         //#endif
-        //spotless:on
     }
 
     public static boolean isModLoaded(String name) {
-        // spotless:off
         //#if FABRIC
         return FabricLoader.getInstance().isModLoaded(name);
         //#else
         //$$ return ModList.get().isLoaded(name);
         //#endif
-        //spotless:on
     }
 
     public static void disableDisplayTest() {
-        // spotless:off
         //#if FABRIC
         try {
             Class.forName("dev.su5ed.sinytra.connector.mod.ConnectorMod").getCanonicalName();
@@ -152,7 +144,6 @@ public class ModLoaderUtil {
     }
 
     public static void registerConfigScreen(Function<Screen, Screen> createScreen) {
-        // spotless:off
     	//#if FORGE || NEOFORGE
     	//#if MC <= 11605
     	//$$         ModLoadingContext.get().registerExtensionPoint(
@@ -177,7 +168,6 @@ public class ModLoaderUtil {
     }
 
     public static void registerClientSetupListener(Runnable runnable) {
-        // spotless:off
     	//#if FORGE || NEOFORGE
         //#if NEOFORGE
         //$$ ModLoadingContext.get().getActiveContainer().getEventBus().addListener(new Consumer<FMLClientSetupEvent>() {
@@ -195,7 +185,6 @@ public class ModLoaderUtil {
     	//spotless:on
     }
 
-    // spotless:off
 	//#if FORGE
   //$$     public static <T extends Event> void registerForgeEvent(Consumer<T> handler) {
     	//$$     	MinecraftForge.EVENT_BUS.addListener(handler);

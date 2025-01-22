@@ -14,7 +14,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-// spotless:off 
 //#if MC < 12102
 //$$ import com.mojang.blaze3d.vertex.Tesselator;
 //#endif
@@ -26,7 +25,6 @@ import net.minecraft.client.gui.GuiGraphics;
 //$$ import net.minecraft.client.renderer.GameRenderer;
 //$$ import net.minecraft.client.gui.GuiComponent;
 //#endif
-// spotless:on
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 

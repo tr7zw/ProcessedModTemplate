@@ -22,7 +22,6 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-//spotless:off 
 //#if MC <= 11904
 //$$ import com.mojang.blaze3d.vertex.PoseStack;
 //#elseif MC <= 12006
@@ -30,15 +29,12 @@ import net.minecraft.network.chat.Component;
 //#else
 import net.minecraft.client.gui.screens.options.OptionsSubScreen;
 //#endif
-//spotless:on
 
-//spotless:off
 //#if MC <= 12004
 //$$ public abstract class CustomConfigScreen extends Screen {
 //#else
 public abstract class CustomConfigScreen extends OptionsSubScreen {
 //#endif
-//spotless:on   
 
     protected final Screen lastScreen;
     private OptionsList list;
@@ -46,13 +42,11 @@ public abstract class CustomConfigScreen extends OptionsSubScreen {
     private Button reset;
 
     public CustomConfigScreen(Screen lastScreen, String title) {
-        // spotless:off
       //#if MC <= 12004
       //$$ super(Component.translatable(title));
       //#else
         super(lastScreen, Minecraft.getInstance().options, ComponentProvider.translatable(title));
       //#endif
-      //spotless:on
         this.lastScreen = lastScreen;
     }
 
@@ -70,16 +64,13 @@ public abstract class CustomConfigScreen extends OptionsSubScreen {
         return list;
     }
 
-    // spotless:off
     //#if MC >= 12100
     @Override
     protected void addOptions() {
     }
     //#endif
-    //spotless:on
     
     protected void init() {
-        // spotless:off
         //#if MC <= 12002
         //$$ this.list = new OptionsList(this.minecraft, this.width, this.height, 32, this.height - 32, 25);
         //#elseif MC <= 12004
@@ -89,7 +80,6 @@ public abstract class CustomConfigScreen extends OptionsSubScreen {
         //#else
         this.list = new OptionsList(this.minecraft, this.width, this);
         //#endif
-        // spotless:on
         this.addWidget(this.list);
         this.createFooter();
         initialize();
@@ -128,7 +118,6 @@ public abstract class CustomConfigScreen extends OptionsSubScreen {
                 }, minecraft.font));
     }
 
-    // spotless:off 
     
     //#if MC >= 12005
     @Override
@@ -170,7 +159,6 @@ public abstract class CustomConfigScreen extends OptionsSubScreen {
     //$$     renderDirtBackground(guiGraphics);
     //$$ }
     //#endif
-    // spotless:on
 
     private <T> TooltipSupplier<T> getOptionalTooltip(String translationKey) {
         return new TooltipSupplier<T>() {
