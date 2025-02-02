@@ -18,6 +18,8 @@ import net.minecraft.network.chat.MutableComponent;
  */
 public class ComponentProvider {
 
+    public static final Component EMPTY = literal("");
+
     //#if MC >= 11900
     public static MutableComponent literal(String string) {
     	return Component.literal(string);
