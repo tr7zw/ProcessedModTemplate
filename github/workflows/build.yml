@@ -23,12 +23,15 @@ jobs:
         with:
           gradle-home-cache-cleanup: true
           dependency-graph: generate-and-submit
-# Already needs to be executable, so the dirty check is correct
-#      - name: make gradle wrapper executable
-#        if: ${{ runner.os != 'Windows' }}
-#        run: chmod +x ./gradlecw
       - name: build
         run: ./gradlecw build
+      <publishSnapshot>
+      - name: Publish to Nexus
+        run: ./gradlecw publish
+        env:
+          NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
+          NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+      </publishSnapshot>
       - name: capture build artifacts
         uses: actions/upload-artifact@v4
         with:

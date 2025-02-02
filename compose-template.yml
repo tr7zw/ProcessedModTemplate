@@ -70,3 +70,4 @@ availableFlags:
   - publishNeo
   - accesswidener
   - versionless
+  - publishSnapshot
