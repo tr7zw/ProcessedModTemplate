@@ -70,12 +70,16 @@ dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings loom.layered() {
 		officialMojangMappings()
-		if (mcVersion >= 12100) {
+		if (mcVersion >= 12104) {
+			parchment("org.parchmentmc.data:parchment-${rootProject.parchment_mc_version_21_4}:${rootProject.parchment_version_21_4}@zip")
+		} else if (mcVersion >= 12100) {
 			parchment("org.parchmentmc.data:parchment-${rootProject.parchment_mc_version_21}:${rootProject.parchment_version_21}@zip")
 		} else if (mcVersion >= 12004) {
 			parchment("org.parchmentmc.data:parchment-${rootProject.parchment_mc_version_20_4}:${rootProject.parchment_version_20_4}@zip")
 		} else if(mcVersion >= 12002) {
 			parchment("org.parchmentmc.data:parchment-${rootProject.parchment_mc_version_20_2}:${rootProject.parchment_version_20_2}@zip")
+		} else if(mcVersion >= 12001) {
+			parchment("org.parchmentmc.data:parchment-${rootProject.parchment_mc_version_20_1}:${rootProject.parchment_version_20_1}@zip")
 		}
 	}
 
