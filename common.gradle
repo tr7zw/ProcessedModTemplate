@@ -368,7 +368,7 @@ publishing {
         mavenJava(MavenPublication) {
             groupId = group
             artifactId = "$name$"
-            version = "${rootProject.mod_version}"
+            version = "${rootProject.mod_version}-SNAPSHOT"
 
             artifact(tasks.named("remapJar").map { it.archiveFile.get().asFile }) {
                 classifier = "${project.minecraft_version}-${mod_brand}"
