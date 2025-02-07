@@ -1,5 +1,6 @@
 package dev.tr7zw.util;
 
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
@@ -11,6 +12,9 @@ import net.minecraft.network.chat.Component;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+
+import java.util.Map.Entry;
+import java.util.Set;
 
 //#if MC >= 11903
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -91,6 +95,13 @@ public class NMSHelper {
         //#endif
     }
 
+    public static Set<Entry<ResourceKey<Item>, Item>> getItems() {
+        //#if MC >= 11903
+        return BuiltInRegistries.ITEM.entrySet();
+        //#else
+        //$$ return Registry.ITEM.entrySet();
+        //#endif
+    }
 
     public static float getXRot(Entity ent) {
     	//#if MC >= 11700
