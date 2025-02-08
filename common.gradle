@@ -67,6 +67,11 @@ configurations {
 	implementation.extendsFrom inc
 }
 
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 10, 'minutes'
+    resolutionStrategy.cacheDynamicVersionsFor 4, 'hours'
+}
+
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings loom.layered() {
