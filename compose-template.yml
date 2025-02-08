@@ -71,3 +71,4 @@ availableFlags:
   - accesswidener
   - versionless
   - publishSnapshot
+  - addTRenderLib

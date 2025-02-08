@@ -25,18 +25,18 @@ jobs:
           dependency-graph: generate-and-submit
       - name: build
         run: ./gradlecw build
-      <publishSnapshot>
-      - name: Publish to Nexus
-        run: ./gradlecw publish
-        env:
-          NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
-          NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
-      </publishSnapshot>
       - name: capture build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: Artifacts
           path: 'versions/**/build/libs/*.jar'
+      <publishSnapshot>
+      - name: Publish to Nexus
+        run: ./gradlecw clean publish -Pbuild.release=true
+        env:
+          NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
+          NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+      </publishSnapshot>
 
 #      - name: Test Report
 #        uses: dorny/test-reporter@v1

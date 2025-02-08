@@ -90,6 +90,11 @@ dependencies {
 	testCompileOnly 'org.projectlombok:lombok:1.18.36'
 	testAnnotationProcessor 'org.projectlombok:lombok:1.18.36'
 
+	<addTRenderLib>
+	include "dev.tr7zw:TRender:${rootProject.trender_version}-${project.minecraft_version}-${mod_brand}-SNAPSHOT@jar"
+	modImplementation "dev.tr7zw:TRender:${rootProject.trender_version}-${project.minecraft_version}-${mod_brand}-SNAPSHOT@jar"
+	</addTRenderLib>
+
 	if (mod_brand == 'fabric') {
 		modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
 
