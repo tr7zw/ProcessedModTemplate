@@ -130,6 +130,11 @@ preprocess {
 	mc12104_fabric.link(mc12104_neoforge, null)
 }
 
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 1, 'minutes'
+    resolutionStrategy.cacheDynamicVersionsFor 1, 'minutes'
+}
+
 tasks.register('buildAndGather') {
 	subprojects {
 		dependsOn project.tasks.named('build').get()

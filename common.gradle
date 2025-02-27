@@ -68,9 +68,10 @@ configurations {
 }
 
 configurations.all {
-    resolutionStrategy.cacheChangingModulesFor 10, 'minutes'
-    resolutionStrategy.cacheDynamicVersionsFor 4, 'hours'
+    resolutionStrategy.cacheChangingModulesFor 1, 'minutes'
+    resolutionStrategy.cacheDynamicVersionsFor 1, 'minutes'
 }
+
 
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -96,7 +97,9 @@ dependencies {
 	testAnnotationProcessor 'org.projectlombok:lombok:1.18.36'
 
 	<addTRenderLib>
-	include "dev.tr7zw:TRender:${rootProject.trender_version}-${project.minecraft_version}-${mod_brand}-SNAPSHOT@jar"
+	include("dev.tr7zw:TRender:${rootProject.trender_version}-${project.minecraft_version}-${mod_brand}-SNAPSHOT@jar") {
+		changing = true
+	}
 	modImplementation "dev.tr7zw:TRender:${rootProject.trender_version}-${project.minecraft_version}-${mod_brand}-SNAPSHOT@jar"
 	</addTRenderLib>
 
