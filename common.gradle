@@ -407,7 +407,7 @@ publishMods {
     // Set the main file to be uploaded
     file = tasks.remapJar.archiveFile
  
-    changelog = providers.environmentVariable("RELEASE_CHANGELOG").getOrNull() != null ? providers.environmentVariable("RELEASE_CHANGELOG").get() : "Allan, please add details! (tr messed up the changelog)"
+    changelog = file("${project.rootProject.rootDir}/changelog.md").text
  
     version = "${rootProject.mod_version}"
  
@@ -417,7 +417,7 @@ publishMods {
  
     modLoaders.add(mod_brand)
  
-    dryRun = true//providers.environmentVariable("MODRINTH_TOKEN").getOrNull() == null || providers.environmentVariable("CURSEFORGE_API_KEY").getOrNull() == null || providers.environmentVariable("RELEASE_CHANGELOG").getOrNull() == null
+    dryRun = true//providers.environmentVariable("MODRINTH_TOKEN").getOrNull() == null || providers.environmentVariable("CURSEFORGE_API_KEY").getOrNull() == null || !file("${project.rootProject.rootDir}/changelog.md").exists()
 
 	curseforge {
         accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
