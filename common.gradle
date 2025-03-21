@@ -407,7 +407,7 @@ publishMods {
     // Set the main file to be uploaded
     file = tasks.remapJar.archiveFile
  
-    changelog = file("${project.rootProject.rootDir}/changelog.md").text
+    changelog = file("${project.rootProject.rootDir}/changelog.md").exists() ? file("${project.rootProject.rootDir}/changelog.md").text : "Allan, please add details! (tr messed up the changelog)"
  
     version = "${rootProject.mod_version}"
  
