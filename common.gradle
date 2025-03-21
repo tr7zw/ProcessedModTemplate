@@ -6,6 +6,7 @@ plugins {
 	id 'com.gradleup.shadow' version '9.0.0-beta4' apply false
 	id "com.diffplug.spotless" version "7.0.0.BETA4" apply false
 	id "net.raphimc.java-downgrader" version "1.1.2-SNAPSHOT" apply false
+	id "me.modmuss50.mod-publish-plugin" version "0.8.4" apply false
 	id 'maven-publish'
 	
     // This dependency is only used to determine the state of the Git working tree so that build artifacts can be
@@ -18,6 +19,7 @@ apply plugin: "dev.architectury.loom"
 apply plugin: 'com.replaymod.preprocess'
 apply plugin: 'com.gradleup.shadow'
 apply plugin: 'net.raphimc.java-downgrader'
+apply plugin: 'me.modmuss50.mod-publish-plugin'
 
 def mod_brand = (loom.platform.get() as String).toLowerCase()
 assert mod_brand in ['fabric', 'forge', 'neoforge']
@@ -70,7 +72,6 @@ configurations.all {
     resolutionStrategy.cacheChangingModulesFor 1, 'minutes'
     resolutionStrategy.cacheDynamicVersionsFor 1, 'minutes'
 }
-
 
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -399,4 +400,36 @@ publishing {
             }
         }
     }
+}
+
+publishMods {
+
+    // Set the main file to be uploaded
+    file = tasks.remapJar.archiveFile
+ 
+    changelog = providers.environmentVariable("RELEASE_CHANGELOG").getOrNull() != null ? providers.environmentVariable("RELEASE_CHANGELOG").get() : "Allan, please add details! (tr messed up the changelog)"
+ 
+    version = "${rootProject.mod_version}"
+ 
+    type = STABLE
+ 
+    displayName = "${rootProject.mod_version}-${project.minecraft_version} - " + (mod_brand == "fabric" ? "Fabric" : mod_brand == "forge" ? "Forge" : "NeoForge")
+ 
+    modLoaders.add(mod_brand)
+ 
+    dryRun = true//providers.environmentVariable("MODRINTH_TOKEN").getOrNull() == null || providers.environmentVariable("CURSEFORGE_API_KEY").getOrNull() == null || providers.environmentVariable("RELEASE_CHANGELOG").getOrNull() == null
+
+	curseforge {
+        accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
+        projectId = "$curseforgeid$"
+		projectSlug = "$id$"
+        minecraftVersions.add("${project.minecraft_version}")
+    }
+
+	modrinth {
+        accessToken = providers.environmentVariable("MODRINTH_API_KEY")
+        projectId = "$modrinthid$"
+        minecraftVersions.add("${project.minecraft_version}")
+    }
+
 }
