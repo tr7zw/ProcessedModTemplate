@@ -208,7 +208,8 @@ processResources {
 		12100: 34,
 		12102: 42,
 		12103: 42,
-		12104: 46
+		12104: 46,
+		12105: 55
 	]
 
 	var replaceProperties = [
