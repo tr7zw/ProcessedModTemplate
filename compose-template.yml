@@ -13,6 +13,8 @@ defaultReplacements:
   sourcesUrl: "https://github.com/tr7zw"
   issuesUrl: "https://github.com/tr7zw"
   mcpublishVersion: "3.3.0"
+  curseforgeid: ""
+  modrinthid: ""
   breaks: ""
 customEntries:
   - versions/1.16.5-fabric/gradle.properties
