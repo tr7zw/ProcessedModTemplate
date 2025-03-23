@@ -109,6 +109,8 @@ dependencies {
 		modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 		if(project.hasProperty('mod_menu_compile_only')) {
     		modCompileOnly "maven.modrinth:modmenu:${project.mod_menu_release}"
+		} else if (mcVersion == 12105) {
+			modImplementation 'terraformers:modmenu:14.0.0-rc2@jar'
 		} else {
 			modImplementation "maven.modrinth:modmenu:${project.mod_menu_release}"
 		}
@@ -279,6 +281,10 @@ repositories {
 	maven {
 		name = "tr7zw-proxy"
 		url "https://maven.tr7zw.dev/repository/maven-public/"
+	}
+	maven {
+		name = "tr7zw-tmp"
+		url "https://maven.tr7zw.dev/repository/maven-tmp/"
 	}
 	maven {
 		name = "Modrinth"
