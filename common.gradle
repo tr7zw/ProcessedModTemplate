@@ -63,6 +63,14 @@ loom {
 
 }
 
+eclipse {
+	project {
+		name "${parent.name}-${project.name}"
+
+		comment 'Gradle project ' + "${parent.name}-${project.name}"
+	}
+}
+
 configurations {
 	inc
 	implementation.extendsFrom inc
