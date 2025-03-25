@@ -434,6 +434,8 @@ publishMods {
  
     dryRun = providers.environmentVariable("MODRINTH_TOKEN").getOrNull() == null || providers.environmentVariable("CURSEFORGE_TOKEN").getOrNull() == null || !file("${project.rootProject.rootDir}/changelog.md").exists()
 
+	maxRetries = 6 // aggresivly retry on fail
+
 	curseforge {
         accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
         projectId = "$curseforgeid$"
