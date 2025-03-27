@@ -50,6 +50,8 @@ customEntries:
   - versions/1.21.4-neoforge/gradle.properties
   - versions/1.21.4-forge/gradle.properties
   - versions/1.21.5-fabric/gradle.properties
+  - versions/1.21.5-neoforge/gradle.properties
+  - versions/1.21.5-forge/gradle.properties
   - src/main/neoforge-resources/META-INF/mods.toml
   - src/main/neoforge-resources/META-INF/neoforge.mods.toml
   - src/main/forge-resources/META-INF/mods.toml
