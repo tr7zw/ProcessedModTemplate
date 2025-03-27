@@ -4,6 +4,8 @@ defaultReplacements:
   fabric_dependencies: ""
   forge_dependencies: ""
   neoforge_dependencies: ""
+  curseforge_dependencies: ""
+  modrinth_dependencies: ""
   licensename: "LICENSE"
   author: "tr7zw"
   group: "dev.tr7zw"

@@ -447,6 +447,7 @@ publishMods {
 		if (mod_brand == "fabric") {
 			requires("fabric-api")
 		}
+		$curseforge_dependencies$
     }
 
 	modrinth {
@@ -459,6 +460,7 @@ publishMods {
 		if (mod_brand == "fabric") {
 			requires("fabric-api")
 		}
+		$modrinth_dependencies$
     }
 
 }
