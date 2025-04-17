@@ -230,7 +230,8 @@ processResources {
 		12102: 42,
 		12103: 42,
 		12104: 46,
-		12105: 55
+		12105: 55,
+		12106: 57
 	]
 
 	var replaceProperties = [
@@ -426,6 +427,10 @@ publishing {
             }
         }
     }
+}
+
+tasks.named("publishMods") {
+	onlyIf { !("${project.minecraft_version}".contains("w") || "${project.minecraft_version}".contains("rc") || "${project.minecraft_version}".contains("pre")) }
 }
 
 publishMods {
