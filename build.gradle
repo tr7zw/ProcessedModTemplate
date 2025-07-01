@@ -141,7 +141,7 @@ preprocess {
 	mc12105_fabric.link(mc12105_forge, null)
 	mc12105_fabric.link(mc12105_neoforge, null)
 	// 1.21.6
-	// fabric 1.21.5 is technically here
+	// fabric 1.21.6 is technically here
 	mc12106_fabric.link(mc12106_forge, null)
 	mc12106_fabric.link(mc12106_neoforge, null)
 }

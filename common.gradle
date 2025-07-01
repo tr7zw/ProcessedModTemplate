@@ -462,6 +462,9 @@ publishMods {
 		if (project.minecraft_version == "1.21") {
 			minecraftVersions.add("1.21.1")
 		}
+		if (project.minecraft_version == "1.21.6") {
+			minecraftVersions.add("1.21.7")
+		}
 		if (mod_brand == "fabric") {
 			requires("fabric-api")
 		}
@@ -474,6 +477,9 @@ publishMods {
         minecraftVersions.add("${project.minecraft_version}")
 		if (project.minecraft_version == "1.21") {
 			minecraftVersions.add("1.21.1")
+		}
+		if (project.minecraft_version == "1.21.6") {
+			minecraftVersions.add("1.21.7")
 		}
 		if (mod_brand == "fabric") {
 			requires("fabric-api")
