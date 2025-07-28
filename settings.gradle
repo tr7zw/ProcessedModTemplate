@@ -9,26 +9,71 @@ pluginManagement {
         }
         gradlePluginPortal()
         mavenCentral()
+		maven{ url "https://maven.kikugie.dev/snapshots"}
+        maven{ url "https://maven.kikugie.dev/releases"}
     }
-    resolutionStrategy {
-		eachPlugin {
-			switch (requested.id.id) {
-				case "com.replaymod.preprocess": {
-					useModule("com.github.Fallen-Breath:preprocessor:${requested.version}")
-					break
-				}
+}
+
+plugins {
+    id("dev.kikugie.stonecutter") version "0.7.6"
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
+	id "com.diffplug.spotless" version "7.0.0.BETA4" apply false
+}
+
+gradle.beforeProject { Project project ->
+    if (project == gradle.rootProject) {
+        project.pluginManager.apply("com.diffplug.spotless")
+
+		project.repositories {
+			mavenCentral()
+		}
+        project.spotless {
+			java {
+				target '**/*.java'
+				eclipse().configFile("${project.rootDir}/formatter.xml")
+				toggleOffOn()
+			}
+			format 'misc', {
+				target '**/*.gitattributes', '**/*.gitignore', '**/*.toml'
+
+				trimTrailingWhitespace()
+				endWithNewline()
+			}
+			yaml {
+				target '**/*.yaml'
+				jackson()
+			}
+			json {
+				target '**/*.json' 
+				gson()
+			}
+			flexmark {
+				target '**/*.md'
+				flexmark()
 			}
 		}
-	}
+
+        project.tasks.named('assemble').get().dependsOn 'spotlessApply'
+
+        println "✅ Spotless configured for root project: ${project.name}"
+    }
 }
 
 include(":$versionlessname$")
 
-def settings = new JsonSlurper().parseText(file('settings.json').text)
-for (String version : settings.versions) {
-	include(":$version")
+stonecutter {
+	kotlinController = false
+    centralScript = "common.gradle"
 
-	def proj = project(":$version")
-	proj.projectDir = file("versions/$version")
-	proj.buildFileName = "../../common.gradle"
+    // TODO Disable any versions you don't want to support anb enable any versions you want to support
+    // The versions listed here, commented out or otherwise, all have pre-made gradle.properties.
+    create(getRootProject()) {
+		def settings = new JsonSlurper().parseText(file('settings.json').text)
+		for (String version : settings.versions) {
+			vers("$version","$version".split("-")[0])
+		}
+		vcsVersion = "1.21.6-fabric"
+    }
 }
+
+rootProject.name = "$id$"

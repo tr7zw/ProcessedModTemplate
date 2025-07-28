@@ -16,24 +16,20 @@ plugins {
 
 apply plugin: 'eclipse'
 apply plugin: "dev.architectury.loom"
-apply plugin: 'com.replaymod.preprocess'
 apply plugin: 'com.gradleup.shadow'
 apply plugin: 'net.raphimc.java-downgrader'
 apply plugin: 'me.modmuss50.mod-publish-plugin'
+apply plugin: 'com.diffplug.spotless'
 
 def mod_brand = (loom.platform.get() as String).toLowerCase()
 assert mod_brand in ['fabric', 'forge', 'neoforge']
 assert project.name.endsWith('-' + mod_brand)  // optional check
 
-int mcVersion = 1
-preprocess {
-	mcVersion = vars.get()["MC"] as int
+def mcVersion = "${project.minecraft_version}"
 
-	vars.put("MC", mcVersion)
-	vars.put("FABRIC", mod_brand == 'fabric' ? 1 : 0)
-	vars.put("FORGE", mod_brand == 'forge' ? 1 : 0)
-	vars.put("NEOFORGE", mod_brand == 'neoforge' ? 1 : 0)
-}
+stonecutter.const("fabric",mod_brand == 'fabric')
+stonecutter.const("forge",mod_brand == 'forge')
+stonecutter.const("neoforge",mod_brand == 'neoforge')
 
 loom {
 	if (!(mod_brand == 'neoforge' || (mod_brand == 'forge' && mcVersion >= 12005))) {
@@ -192,6 +188,7 @@ shadowJar {
 }
 
 remapJar {
+	dependsOn(processTestResources)
 	dependsOn(shadowJar)
 	input = shadowJar.archiveFile
 
@@ -214,6 +211,7 @@ test {
 }
 
 processResources {
+	dependsOn(stonecutterGenerate)
 	duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
 
 	def neoforgeVersionRange = project.hasProperty('neo_version_range') ? project.neo_version_range : ''
@@ -222,28 +220,29 @@ processResources {
 	def fabricApiName = project.hasProperty('fabric_api_name') ? project.fabric_api_name : ''
 
 	def versionsMap = [
-		10809: 1,
-		11202: 3,
-		11500: 5,
-		11605: 6,
-		11701: 7,
-		11802: 8,
-		11902: 9,
-		11903: 12,
-		11904: 13,
-		12001: 15,
-		12002: 18,
-		12003: 21,
-		12004: 22,
-		12005: 32,
-		12006: 32,
-		12100: 34,
-		12102: 42,
-		12103: 42,
-		12104: 46,
-		12105: 55,
-		12106: 63
+		"1.8.9": 1,
+		"1.12.2": 3,
+		"1.15.0": 5,
+		"1.16.5": 6,
+		"1.17.1": 7,
+		"1.18.2": 8,
+		"1.19.2": 9,
+		"1.19.3": 12,
+		"1.19.4": 13,
+		"1.20.1": 15,
+		"1.20.2": 18,
+		"1.20.3": 21,
+		"1.20.4": 22,
+		"1.20.5": 32,
+		"1.20.6": 32,
+		"1.21": 34,
+		"1.21.2": 42,
+		"1.21.3": 42,
+		"1.21.4": 46,
+		"1.21.5": 55,
+		"1.21.6": 63
 	]
+	print "Using Minecraft version: $mcVersion with pack format number: ${versionsMap[mcVersion]}" 
 
 	var replaceProperties = [
 			minecraft_version   : minecraft_version, minecraft_version_range_forge: minecraft_dependency,
