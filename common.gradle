@@ -189,6 +189,11 @@ shadowJar {
 	configurations = [project.configurations.inc]
 	relocate 'dev.tr7zw.util', '$relocationpackage$.util'
 	relocate 'dev.tr7zw.config', '$relocationpackage$.config'
+	if(mcVersion < 11800) {
+		finalizedBy("java8Jar")
+	} else if (mcVersion <= 12004) {
+		finalizedBy("java17Jar")
+	}
 }
 
 remapJar {
@@ -198,11 +203,6 @@ remapJar {
 	doLast {
 		// Delete the shadowJar.archiveFile after remapJar task is executed
 		delete shadowJar.archiveFile
-	}
-	if(mcVersion < 11800) {
-		finalizedBy("java8Jar")
-	} else if (mcVersion <= 12004) {
-		finalizedBy("java17Jar")
 	}
 }
 
@@ -372,17 +372,17 @@ def deleteBinDir(dir) {
 }
 
 tasks.register("java8Jar", DowngradeJarTask) {
-	dependsOn remapJar
-	input = tasks.remapJar.archiveFile.get().asFile
+	dependsOn shadowJar
+	def inputFile = tasks.shadowJar.archiveFile.get().asFile
+	def outputDirectory = inputFile.parent
+	def originalFileName = inputFile.getName().substring(0, inputFile.getName().length() - 4);
+	input = new File(outputDirectory, "${originalFileName}.jar")
     outputSuffix = "+java8"
     compileClassPath = sourceSets.main.compileClasspath
     copyRuntimeClasses = false
 	doLast {
-		// Delete the remapJar.archiveFile
-		delete remapJar.archiveFile
-		def inputFile = tasks.remapJar.archiveFile.get().asFile
-        def outputDirectory = inputFile.parent
-        def originalFileName = inputFile.getName().substring(0, inputFile.getName().length() - 4);
+		// Delete the shadowJar.archiveFile
+		delete shadowJar.archiveFile
 
         // Renaming the generated file to the original name
         def generatedFile = new File(outputDirectory, "${originalFileName}+java8.jar")
@@ -391,18 +391,18 @@ tasks.register("java8Jar", DowngradeJarTask) {
 }
 
 tasks.register("java17Jar", DowngradeJarTask) {
-	dependsOn remapJar
-	input = tasks.remapJar.archiveFile.get().asFile
+	dependsOn shadowJar
+	def inputFile = tasks.shadowJar.archiveFile.get().asFile
+	def outputDirectory = inputFile.parent
+	def originalFileName = inputFile.getName().substring(0, inputFile.getName().length() - 4);
+	input = new File(outputDirectory, "${originalFileName}.jar")
     outputSuffix = "+java17"
     compileClassPath = sourceSets.main.compileClasspath
     copyRuntimeClasses = false
 	targetVersion = Opcodes.V17
 	doLast {
-		// Delete the remapJar.archiveFile
-		delete remapJar.archiveFile
-		def inputFile = tasks.remapJar.archiveFile.get().asFile
-        def outputDirectory = inputFile.parent
-        def originalFileName = inputFile.getName().substring(0, inputFile.getName().length() - 4);
+		// Delete the shadowJar.archiveFile
+		delete shadowJar.archiveFile
 
         // Renaming the generated file to the original name
         def generatedFile = new File(outputDirectory, "${originalFileName}+java17.jar")
