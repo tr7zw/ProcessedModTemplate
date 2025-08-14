@@ -443,6 +443,7 @@ tasks.named("publishMods") {
 	onlyIf { !("${project.minecraft_version}".contains("w") || "${project.minecraft_version}".contains("rc") || "${project.minecraft_version}".contains("pre")) }
 }
 
+<autopublish>
 publishMods {
 
     // Set the main file to be uploaded
@@ -461,7 +462,7 @@ publishMods {
     dryRun = providers.environmentVariable("MODRINTH_TOKEN").getOrNull() == null || providers.environmentVariable("CURSEFORGE_TOKEN").getOrNull() == null || !file("${project.rootProject.rootDir}/changelog.md").exists()
 
 	maxRetries = 6 // aggresivly retry on fail
-
+	<curseforge>
 	curseforge {
         accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
         projectId = "$curseforgeid$"
@@ -479,7 +480,8 @@ publishMods {
 		}
 		$curseforge_dependencies$
     }
-
+	</curseforge>
+	<modrinth>
 	modrinth {
         accessToken = providers.environmentVariable("MODRINTH_TOKEN")
         projectId = "$modrinthid$"
@@ -496,5 +498,6 @@ publishMods {
 		}
 		$modrinth_dependencies$
     }
-
+	</modrinth>
 }
+</autopublish>
