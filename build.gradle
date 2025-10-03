@@ -77,9 +77,9 @@ preprocess {
 	def mc12006_forge = createNode('1.20.6-forge', 1_20_06, 'official')
 	def mc12006_neoforge  = createNode('1.20.6-neoforge' , 1_20_06, 'official')
 
-	def mc12100_fabric = createNode('1.21-fabric', 1_21_00, 'official')
-	def mc12100_forge = createNode('1.21-forge', 1_21_00, 'official')
-	def mc12100_neoforge  = createNode('1.21-neoforge' , 1_21_00, 'official')
+	def mc12101_fabric = createNode('1.21.1-fabric', 1_21_01, 'official')
+	def mc12101_forge = createNode('1.21.1-forge', 1_21_01, 'official')
+	def mc12101_neoforge  = createNode('1.21.1-neoforge' , 1_21_01, 'official')
 
 	def mc12103_fabric = createNode('1.21.3-fabric', 1_21_03, 'official')
 	def mc12103_forge  = createNode('1.21.3-forge' , 1_21_03, 'official')
@@ -93,13 +93,13 @@ preprocess {
 	def mc12105_forge  = createNode('1.21.5-forge' , 1_21_05, 'official')
 	def mc12105_neoforge  = createNode('1.21.5-neoforge' , 1_21_05, 'official')
 
-	def mc12106_fabric = createNode('1.21.6-fabric', 1_21_06, 'official')
-	def mc12106_forge  = createNode('1.21.6-forge' , 1_21_06, 'official')
-	def mc12106_neoforge  = createNode('1.21.6-neoforge' , 1_21_06, 'official')
+	def mc12108_fabric = createNode('1.21.8-fabric', 1_21_08, 'official')
+	def mc12108_forge  = createNode('1.21.8-forge' , 1_21_08, 'official')
+	def mc12108_neoforge  = createNode('1.21.8-neoforge' , 1_21_08, 'official')
 
-	def mc12109_fabric = createNode('1.21.9-fabric', 1_21_09, 'official')
-	def mc12109_forge  = createNode('1.21.9-forge' , 1_21_09, 'official')
-	def mc12109_neoforge  = createNode('1.21.9-neoforge' , 1_21_09, 'official')
+	def mc12110_fabric = createNode('1.21.10-fabric', 1_21_10, 'official')
+	def mc12110_forge  = createNode('1.21.10-forge' , 1_21_10, 'official')
+	def mc12110_neoforge  = createNode('1.21.10-neoforge' , 1_21_10, 'official')
 
 	// 1.16.5
 	mc11605_fabric.link(mc11605_forge, null)
@@ -125,13 +125,13 @@ preprocess {
 	mc12004_fabric.link(mc12004_forge, null)
 	mc12004_fabric.link(mc12004_neoforge, null)
 	// 1.20.6
-	mc12100_fabric.link(mc12006_fabric, null)
+	mc12101_fabric.link(mc12006_fabric, null)
 	mc12006_fabric.link(mc12006_forge, null)
 	mc12006_fabric.link(mc12006_neoforge, null)
-	// 1.21
-	mc12103_fabric.link(mc12100_fabric, null)
-	mc12100_fabric.link(mc12100_forge, null)
-	mc12100_fabric.link(mc12100_neoforge, null)
+	// 1.21.1
+	mc12103_fabric.link(mc12101_fabric, null)
+	mc12101_fabric.link(mc12101_forge, null)
+	mc12101_fabric.link(mc12101_neoforge, null)
 	// 1.21.3
 	mc12104_fabric.link(mc12103_fabric, null)
 	mc12103_fabric.link(mc12103_forge, null)
@@ -141,17 +141,17 @@ preprocess {
 	mc12104_fabric.link(mc12104_forge, null)
 	mc12104_fabric.link(mc12104_neoforge, null)
  	// 1.21.5
-	mc12106_fabric.link(mc12105_fabric, null)
+	mc12108_fabric.link(mc12105_fabric, null)
 	mc12105_fabric.link(mc12105_forge, null)
 	mc12105_fabric.link(mc12105_neoforge, null)
-	// 1.21.6
-	mc12109_fabric.link(mc12106_fabric, null)
-	mc12106_fabric.link(mc12106_forge, null)
-	mc12106_fabric.link(mc12106_neoforge, null)
-	// 1.21.9
-	// fabric 1.21.9 is technically here
-	mc12109_fabric.link(mc12109_forge, null)
-	mc12109_fabric.link(mc12109_neoforge, null)
+	// 1.21.8
+	mc12110_fabric.link(mc12108_fabric, null)
+	mc12108_fabric.link(mc12108_forge, null)
+	mc12108_fabric.link(mc12108_neoforge, null)
+	// 1.21.10
+	// fabric 1.21.10 is technically here
+	mc12110_fabric.link(mc12110_forge, null)
+	mc12110_fabric.link(mc12110_neoforge, null)
 }
 
 configurations.all {

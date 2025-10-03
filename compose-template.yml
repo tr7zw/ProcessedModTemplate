@@ -42,9 +42,9 @@ customEntries:
   - versions/1.20.6-fabric/gradle.properties
   - versions/1.20.6-forge/gradle.properties
   - versions/1.20.6-neoforge/gradle.properties
-  - versions/1.21-fabric/gradle.properties
-  - versions/1.21-forge/gradle.properties
-  - versions/1.21-neoforge/gradle.properties
+  - versions/1.21.1-fabric/gradle.properties
+  - versions/1.21.1-forge/gradle.properties
+  - versions/1.21.1-neoforge/gradle.properties
   - versions/1.21.3-fabric/gradle.properties
   - versions/1.21.3-neoforge/gradle.properties
   - versions/1.21.3-forge/gradle.properties
@@ -54,12 +54,12 @@ customEntries:
   - versions/1.21.5-fabric/gradle.properties
   - versions/1.21.5-neoforge/gradle.properties
   - versions/1.21.5-forge/gradle.properties
-  - versions/1.21.6-fabric/gradle.properties
-  - versions/1.21.6-neoforge/gradle.properties
-  - versions/1.21.6-forge/gradle.properties
-  - versions/1.21.9-neoforge/gradle.properties
-  - versions/1.21.9-forge/gradle.properties
-  - versions/1.21.9-fabric/gradle.properties
+  - versions/1.21.8-fabric/gradle.properties
+  - versions/1.21.8-neoforge/gradle.properties
+  - versions/1.21.8-forge/gradle.properties
+  - versions/1.21.10-neoforge/gradle.properties
+  - versions/1.21.10-forge/gradle.properties
+  - versions/1.21.10-fabric/gradle.properties
   - src/main/neoforge-resources/META-INF/mods.toml
   - src/main/neoforge-resources/META-INF/neoforge.mods.toml
   - src/main/forge-resources/META-INF/mods.toml
