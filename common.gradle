@@ -133,6 +133,9 @@ dependencies {
 	</includeLibs>
 	</mixinextras>
 
+    if (System.getProperty("idea.active") == "true" || System.getProperty("eclipse.buildId") != null) {
+		sourceSets.main.resources.srcDirs += "${project.projectDir}/build/generated/sources/annotationProcessor/java/main"
+	}
 	if (mod_brand == 'fabric') {
 		modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
 
