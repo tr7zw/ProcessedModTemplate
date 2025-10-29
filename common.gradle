@@ -2,11 +2,11 @@ import net.raphimc.javadowngrader.gradle.task.DowngradeJarTask
 import org.objectweb.asm.Opcodes
 
 plugins {
-	id "dev.architectury.loom" version "1.10-SNAPSHOT" apply false
+	id "dev.architectury.loom" version "1.11-SNAPSHOT" apply false
 	id 'com.gradleup.shadow' version '9.0.0-beta4' apply false
 	id "com.diffplug.spotless" version "7.0.0.BETA4" apply false
 	id "net.raphimc.java-downgrader" version "1.1.2-SNAPSHOT" apply false
-	id "me.modmuss50.mod-publish-plugin" version "0.8.4" apply false
+	id "me.modmuss50.mod-publish-plugin" version "1.0.0" apply false
 	id 'maven-publish'
 	
     // This dependency is only used to determine the state of the Git working tree so that build artifacts can be
@@ -129,6 +129,9 @@ dependencies {
 	</includeLibs>
 	</mixinextras>
 
+    if (System.getProperty("idea.active") == "true" || System.getProperty("eclipse.buildId") != null) {
+		sourceSets.main.resources.srcDirs += "${project.projectDir}/build/generated/sources/annotationProcessor/java/main"
+	}
 	if (mod_brand == 'fabric') {
 		modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
 
@@ -185,6 +188,11 @@ shadowJar {
 	configurations = [project.configurations.inc]
 	relocate 'dev.tr7zw.util', '$relocationpackage$.util'
 	relocate 'dev.tr7zw.config', '$relocationpackage$.config'
+	if(mcVersion < 11800) {
+		finalizedBy("java8Jar")
+	} else if (mcVersion <= 12004) {
+		finalizedBy("java17Jar")
+	}
 }
 
 remapJar {
@@ -195,11 +203,6 @@ remapJar {
 	doLast {
 		// Delete the shadowJar.archiveFile after remapJar task is executed
 		delete shadowJar.archiveFile
-	}
-	if(mcVersion < 11800) {
-		finalizedBy("java8Jar")
-	} else if (mcVersion <= 12004) {
-		finalizedBy("java17Jar")
 	}
 }
 
@@ -240,7 +243,11 @@ processResources {
 		"1.21.3": 42,
 		"1.21.4": 46,
 		"1.21.5": 55,
-		"1.21.6": 63
+		"1.21.6": 63,
+		"1.21.7": 63,
+		"1.21.8": 63,
+		"1.21.9": 69,
+		"1.21.10": 69
 	]
 	print "Using Minecraft version: $mcVersion with pack format number: ${versionsMap[mcVersion]}" 
 
@@ -371,17 +378,17 @@ def deleteBinDir(dir) {
 }
 
 tasks.register("java8Jar", DowngradeJarTask) {
-	dependsOn remapJar
-	input = tasks.remapJar.archiveFile.get().asFile
+	dependsOn shadowJar
+	def inputFile = tasks.shadowJar.archiveFile.get().asFile
+	def outputDirectory = inputFile.parent
+	def originalFileName = inputFile.getName().substring(0, inputFile.getName().length() - 4);
+	input = new File(outputDirectory, "${originalFileName}.jar")
     outputSuffix = "+java8"
     compileClassPath = sourceSets.main.compileClasspath
     copyRuntimeClasses = false
 	doLast {
-		// Delete the remapJar.archiveFile
-		delete remapJar.archiveFile
-		def inputFile = tasks.remapJar.archiveFile.get().asFile
-        def outputDirectory = inputFile.parent
-        def originalFileName = inputFile.getName().substring(0, inputFile.getName().length() - 4);
+		// Delete the shadowJar.archiveFile
+		delete shadowJar.archiveFile
 
         // Renaming the generated file to the original name
         def generatedFile = new File(outputDirectory, "${originalFileName}+java8.jar")
@@ -390,18 +397,18 @@ tasks.register("java8Jar", DowngradeJarTask) {
 }
 
 tasks.register("java17Jar", DowngradeJarTask) {
-	dependsOn remapJar
-	input = tasks.remapJar.archiveFile.get().asFile
+	dependsOn shadowJar
+	def inputFile = tasks.shadowJar.archiveFile.get().asFile
+	def outputDirectory = inputFile.parent
+	def originalFileName = inputFile.getName().substring(0, inputFile.getName().length() - 4);
+	input = new File(outputDirectory, "${originalFileName}.jar")
     outputSuffix = "+java17"
     compileClassPath = sourceSets.main.compileClasspath
     copyRuntimeClasses = false
 	targetVersion = Opcodes.V17
 	doLast {
-		// Delete the remapJar.archiveFile
-		delete remapJar.archiveFile
-		def inputFile = tasks.remapJar.archiveFile.get().asFile
-        def outputDirectory = inputFile.parent
-        def originalFileName = inputFile.getName().substring(0, inputFile.getName().length() - 4);
+		// Delete the shadowJar.archiveFile
+		delete shadowJar.archiveFile
 
         // Renaming the generated file to the original name
         def generatedFile = new File(outputDirectory, "${originalFileName}+java17.jar")
@@ -475,6 +482,9 @@ publishMods {
 			minecraftVersions.add("1.21.7")
 			minecraftVersions.add("1.21.8")
 		}
+		if (project.minecraft_version == "1.21.10") {
+			minecraftVersions.add("1.21.9")
+		}
 		if (mod_brand == "fabric") {
 			requires("fabric-api")
 		}
@@ -492,6 +502,9 @@ publishMods {
 		if (project.minecraft_version == "1.21.6") {
 			minecraftVersions.add("1.21.7")
 			minecraftVersions.add("1.21.8")
+		}
+		if (project.minecraft_version == "1.21.10") {
+			minecraftVersions.add("1.21.9")
 		}
 		if (mod_brand == "fabric") {
 			requires("fabric-api")
