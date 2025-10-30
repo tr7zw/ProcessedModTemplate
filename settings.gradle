@@ -1,4 +1,5 @@
 import groovy.json.JsonSlurper
+import org.ajoberstar.grgit.Grgit
 
 pluginManagement {
     repositories {
@@ -15,15 +16,48 @@ pluginManagement {
 }
 
 plugins {
-    id("dev.kikugie.stonecutter") version "0.7.6"
+    id("dev.kikugie.stonecutter") version "0.8-alpha.8"
     id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 	id "com.diffplug.spotless" version "7.0.0.BETA4" apply false
+	// This dependency is only used to determine the state of the Git working tree so that build artifacts can be
+    // more easily identified. This setup is copied from sodium
+    id 'org.ajoberstar.grgit' version '5.2.1' apply false
+}
+
+def getVersionMetadata() {
+	// CI builds only
+	if (gradle.rootProject.hasProperty("build.release")) {
+		return "" // no tag whatsoever
+	}
+
+	def grgit = null
+    try {
+        grgit = Grgit.open(currentDir: gradle.rootProject.rootDir)
+    } catch(Exception e) {
+        e.printStackTrace()
+    }
+	if (grgit != null) {
+		def head = grgit.head()
+		def id = head.abbreviatedId
+
+		// Flag the build if the build tree is not clean
+		if (!grgit.status().isClean()) {
+			id += "-dirty"
+			println "Changes: " + grgit.status().staged.getAllChanges() + " " + grgit.status().unstaged.getAllChanges()
+		}
+
+		return "+git.${id}"
+	}
+
+	// No tracking information could be found about the build
+	return "+unknown"
 }
 
 gradle.beforeProject { Project project ->
     if (project == gradle.rootProject) {
         project.pluginManager.apply("com.diffplug.spotless")
 
+		gradle.ext.versionMetadata = getVersionMetadata()
 		project.repositories {
 			mavenCentral()
 		}
@@ -72,7 +106,8 @@ stonecutter {
 		for (String version : settings.versions) {
 			vers("$version","$version".split("-")[0])
 		}
-		vcsVersion = "1.21.6-fabric"
+		// read from versions/mainProject file
+		vcsVersion = file('versions/mainProject').text.trim()
     }
 }
 

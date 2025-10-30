@@ -1,6 +1,8 @@
 apply plugin: 'java'
 
-archivesBaseName = rootProject.archives_base_name + "-versionless"
+base {
+    archivesName = rootProject.archives_base_name + "-versionless"
+}
 
 repositories {
 	mavenCentral()
@@ -21,6 +23,8 @@ dependencies {
     $dependencies$
 }
 
-// remapping the jars later for <= 1.17.1 to Java 8
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
+java {
+    // remapping the jars later for <= 1.17.1 to Java 8
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}

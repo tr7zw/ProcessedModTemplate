@@ -8,10 +8,6 @@ plugins {
 	id "net.raphimc.java-downgrader" version "1.1.2-SNAPSHOT" apply false
 	id "me.modmuss50.mod-publish-plugin" version "1.0.0" apply false
 	id 'maven-publish'
-	
-    // This dependency is only used to determine the state of the Git working tree so that build artifacts can be
-    // more easily identified. This setup is copied from sodium
-    id 'org.ajoberstar.grgit' version '5.2.1'
 }
 
 apply plugin: 'eclipse'
@@ -27,9 +23,14 @@ assert project.name.endsWith('-' + mod_brand)  // optional check
 
 def mcVersion = "${project.minecraft_version}"
 
-stonecutter.const("fabric",mod_brand == 'fabric')
-stonecutter.const("forge",mod_brand == 'forge')
-stonecutter.const("neoforge",mod_brand == 'neoforge')
+stonecutter {
+	    constants.match(
+        mod_brand,
+        "fabric",   // != "loader" -> false
+        "neoforge", // == "loader" -> true
+        "forge",    // != "loader" -> false
+    )
+}
 
 loom {
 	if (!(mod_brand == 'neoforge' || (mod_brand == 'forge' && mcVersion >= 12005))) {
@@ -46,7 +47,7 @@ loom {
 	}
 	silentMojangMappingsLicense()
 	if (mod_brand == 'forge') {
-		forge.mixinConfigs "${modid}.mixins.json"
+		//forge.mixinConfigs "${modid}.mixins.json"
 	}
 
 	if(file("${project.rootProject.rootDir}/src/main/resources/$id$.accesswidener").exists()){
@@ -238,7 +239,7 @@ processResources {
 		"1.20.4": 22,
 		"1.20.5": 32,
 		"1.20.6": 32,
-		"1.21": 34,
+		"1.21.1": 34,
 		"1.21.2": 42,
 		"1.21.3": 42,
 		"1.21.4": 46,
@@ -266,7 +267,7 @@ processResources {
 			sources_url		 : "$sourcesUrl$",
 			issues_url		 : "$issuesUrl$",
 			license_name: "$licenseName$",
-			mod_id              : "$id$", mod_name: "$name$", version: "$version$${getVersionMetadata()}",
+			mod_id              : "$id$", mod_name: "$name$", version: "$version$${gradle.ext.versionMetadata}",
 			mod_author         : "$author$", pack_format_number: versionsMap[mcVersion],
 	]
 	inputs.properties replaceProperties
@@ -304,9 +305,10 @@ afterEvaluate { project ->
 		}
 	}
 }
-
-archivesBaseName = rootProject.archives_base_name
-version = mod_brand + "-" + rootProject.mod_version + "-mc" + project.minecraft_version + getVersionMetadata()
+base {
+	archivesName = rootProject.archives_base_name
+}
+version = mod_brand + "-" + rootProject.mod_version + "-mc" + project.minecraft_version + gradle.ext.versionMetadata
 group = rootProject.maven_group
 
 repositories {
@@ -340,36 +342,12 @@ tasks.withType(JavaCompile) {
 	options.encoding = "UTF-8"
 }
 
-// remapping the jars later for <= 1.20.4 to Java 17
-// remapping the jars later for < 1.18 to Java 8
-sourceCompatibility = JavaVersion.VERSION_21
-targetCompatibility = JavaVersion.VERSION_21
-
 java {
+	// remapping the jars later for <= 1.20.4 to Java 17
+	// remapping the jars later for < 1.18 to Java 8
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
 	//withSourcesJar()
-}
-
-def getVersionMetadata() {
-    // CI builds only
-    if (project.hasProperty("build.release")) {
-        return "" // no tag whatsoever
-    }
-
-    if (grgit != null) {
-        def head = grgit.head()
-        def id = head.abbreviatedId
-
-        // Flag the build if the build tree is not clean
-        if (!grgit.status().isClean()) {
-            id += "-dirty"
-            println "Changes: " + grgit.status().staged.getAllChanges() + " " + grgit.status().unstaged.getAllChanges()
-        }
-
-        return "+git.${id}"
-    }
-
-    // No tracking information could be found about the build
-    return "+unknown"
 }
 
 // Function to delete bin directory recursively
