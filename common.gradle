@@ -1,11 +1,9 @@
-import net.raphimc.javadowngrader.gradle.task.DowngradeJarTask
-import org.objectweb.asm.Opcodes
 
 plugins {
 	id "dev.architectury.loom" version "1.11-SNAPSHOT" apply false
 	id 'com.gradleup.shadow' version '9.0.0-beta4' apply false
 	id "com.diffplug.spotless" version "7.0.0.BETA4" apply false
-	id "net.raphimc.java-downgrader" version "1.1.2-SNAPSHOT" apply false
+	id 'xyz.wagyourtail.jvmdowngrader' version '1.3.3' apply false
 	id "me.modmuss50.mod-publish-plugin" version "1.0.0" apply false
 	id 'maven-publish'
 }
@@ -13,7 +11,10 @@ plugins {
 apply plugin: 'eclipse'
 apply plugin: "dev.architectury.loom"
 apply plugin: 'com.gradleup.shadow'
-apply plugin: 'net.raphimc.java-downgrader'
+if (stonecutter.eval("${project.minecraft_version}", "<= 1.20.4")) {
+	println "Applying JVM Downgrader for Minecraft version ${project.minecraft_version}"
+	apply plugin: 'xyz.wagyourtail.jvmdowngrader'
+}
 apply plugin: 'me.modmuss50.mod-publish-plugin'
 apply plugin: 'com.diffplug.spotless'
 
@@ -33,7 +34,7 @@ stonecutter {
 }
 
 loom {
-	if (!(mod_brand == 'neoforge' || (mod_brand == 'forge' && mcVersion >= 12005))) {
+	if (!(mod_brand == 'neoforge' || (mod_brand == 'forge' && stonecutter.eval(mcVersion, ">= 1.20.5")))) {
 		println "Creating refmap for version $mcVersion"
 		mixin {
 			useLegacyMixinAp = true
@@ -82,17 +83,17 @@ dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings loom.layered() {
 		officialMojangMappings()
-		if (mcVersion >= 12105) {
+		if (stonecutter.eval(mcVersion, ">= 1.21.5")) {
 			parchment("org.parchmentmc.data:parchment-${rootProject.parchment_mc_version_21_5}:${rootProject.parchment_version_21_5}@zip")
-		} else if (mcVersion >= 12104) {
+		} else if (stonecutter.eval(mcVersion, ">= 1.21.4")) {
 			parchment("org.parchmentmc.data:parchment-${rootProject.parchment_mc_version_21_4}:${rootProject.parchment_version_21_4}@zip")
-		} else if (mcVersion >= 12100) {
+		} else if (stonecutter.eval(mcVersion, ">= 1.21.0")) {
 			parchment("org.parchmentmc.data:parchment-${rootProject.parchment_mc_version_21}:${rootProject.parchment_version_21}@zip")
-		} else if (mcVersion >= 12004) {
+		} else if (stonecutter.eval(mcVersion, ">= 1.20.4")) {
 			parchment("org.parchmentmc.data:parchment-${rootProject.parchment_mc_version_20_4}:${rootProject.parchment_version_20_4}@zip")
-		} else if(mcVersion >= 12002) {
+		} else if(stonecutter.eval(mcVersion, ">= 1.20.2")) {
 			parchment("org.parchmentmc.data:parchment-${rootProject.parchment_mc_version_20_2}:${rootProject.parchment_version_20_2}@zip")
-		} else if(mcVersion >= 12001) {
+		} else if(stonecutter.eval(mcVersion, ">= 1.20.1")) {
 			parchment("org.parchmentmc.data:parchment-${rootProject.parchment_mc_version_20_1}:${rootProject.parchment_version_20_1}@zip")
 		}
 	}
@@ -139,7 +140,7 @@ dependencies {
 		modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 		if(project.hasProperty('mod_menu_compile_only')) {
     		modCompileOnly "maven.modrinth:modmenu:${project.mod_menu_release}"
-		} else if (mcVersion == 12105) {
+		} else if (stonecutter.eval(mcVersion, "= 1.21.5")) {
 			modImplementation 'terraformers:modmenu:14.0.0-rc2@jar'
 		} else {
 			modImplementation "maven.modrinth:modmenu:${project.mod_menu_release}"
@@ -189,26 +190,33 @@ shadowJar {
 	configurations = [project.configurations.inc]
 	relocate 'dev.tr7zw.util', '$relocationpackage$.util'
 	relocate 'dev.tr7zw.config', '$relocationpackage$.config'
-	if(mcVersion < 11800) {
-		finalizedBy("java8Jar")
-	} else if (mcVersion <= 12004) {
-		finalizedBy("java17Jar")
+	if (stonecutter.eval(mcVersion, "<= 1.20.4")) {
+		finalizedBy("shadeDowngradedApi")
 	}
 }
 
 remapJar {
 	dependsOn(processTestResources)
 	dependsOn(shadowJar)
-	input = shadowJar.archiveFile
+	if (stonecutter.eval(mcVersion, "<= 1.20.4")) {
+		dependsOn(shadeDowngradedApi)
+		input = shadeDowngradedApi.archiveFile
+	} else {
+		input = shadowJar.archiveFile
+	}
 
 	doLast {
 		// Delete the shadowJar.archiveFile after remapJar task is executed
 		delete shadowJar.archiveFile
+		if (stonecutter.eval(mcVersion, "<= 1.20.4")) {
+			delete shadeDowngradedApi.archiveFile
+			delete downgradeJar.archiveFile
+		}
 	}
 }
 
-test.onlyIf { mod_brand == 'fabric' && mcVersion >= 11800 }
-compileTestJava.onlyIf { mod_brand == 'fabric' && mcVersion >= 11800 }
+test.onlyIf { mod_brand == 'fabric' && stonecutter.eval(mcVersion, ">= 1.18.0") }
+compileTestJava.onlyIf { mod_brand == 'fabric' && stonecutter.eval(mcVersion, ">= 1.18.0") }
 
 test {
 	useJUnitPlatform()
@@ -355,42 +363,24 @@ def deleteBinDir(dir) {
     ant.delete(dir: dir, failonerror: false)
 }
 
-tasks.register("java8Jar", DowngradeJarTask) {
-	dependsOn shadowJar
-	def inputFile = tasks.shadowJar.archiveFile.get().asFile
-	def outputDirectory = inputFile.parent
-	def originalFileName = inputFile.getName().substring(0, inputFile.getName().length() - 4);
-	input = new File(outputDirectory, "${originalFileName}.jar")
-    outputSuffix = "+java8"
-    compileClassPath = sourceSets.main.compileClasspath
-    copyRuntimeClasses = false
-	doLast {
-		// Delete the shadowJar.archiveFile
-		delete shadowJar.archiveFile
+if (stonecutter.eval(mcVersion, "<= 1.20.4")) {
+	downgradeJar {
+		dependsOn shadowJar
+		if (stonecutter.eval(mcVersion, ">= 1.18.0")) {
+			downgradeTo = JavaVersion.VERSION_17
+		}
+		doLast {
+			def inputShadowFile = tasks.shadowJar.archiveFile.get().asFile
+			def outputDirectory = inputShadowFile.parent
+			def originalFileName = inputShadowFile.getName().substring(0, inputShadowFile.getName().length() - 4);
+			// Delete the shadowJar.archiveFile
+			delete shadowJar.archiveFile
 
-        // Renaming the generated file to the original name
-        def generatedFile = new File(outputDirectory, "${originalFileName}+java8.jar")
-        generatedFile.renameTo(inputFile)
-	}
-}
-
-tasks.register("java17Jar", DowngradeJarTask) {
-	dependsOn shadowJar
-	def inputFile = tasks.shadowJar.archiveFile.get().asFile
-	def outputDirectory = inputFile.parent
-	def originalFileName = inputFile.getName().substring(0, inputFile.getName().length() - 4);
-	input = new File(outputDirectory, "${originalFileName}.jar")
-    outputSuffix = "+java17"
-    compileClassPath = sourceSets.main.compileClasspath
-    copyRuntimeClasses = false
-	targetVersion = Opcodes.V17
-	doLast {
-		// Delete the shadowJar.archiveFile
-		delete shadowJar.archiveFile
-
-        // Renaming the generated file to the original name
-        def generatedFile = new File(outputDirectory, "${originalFileName}+java17.jar")
-        generatedFile.renameTo(inputFile)
+			// Renaming the generated file to the original name
+			def generatedFile = new File(outputDirectory, "${originalFileName}-downgraded-shaded.jar")
+			println "Renaming ${generatedFile} to ${inputShadowFile}"
+			generatedFile.renameTo(inputShadowFile)
+		}
 	}
 }
 
