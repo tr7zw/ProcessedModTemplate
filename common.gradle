@@ -187,6 +187,7 @@ shadowJar {
 	configurations = [project.configurations.inc]
 	relocate 'dev.tr7zw.util', '$relocationpackage$.util'
 	relocate 'dev.tr7zw.config', '$relocationpackage$.config'
+	relocate 'io.sentry', 'dev.tr7zw.lib.sentry'
 	if (stonecutter.eval(mcVersion, "<= 1.20.4")) {
 		finalizedBy("shadeDowngradedApi")
 	}
