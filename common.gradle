@@ -213,6 +213,15 @@ remapJar {
 	}
 }
 
+if (stonecutter.eval(mcVersion, "<= 1.20.4")) {
+	jvmdg.shadePath = new kotlin.jvm.functions.Function1<String, String>() {
+		@Override
+		String invoke(String it) {
+			return "$id$"
+		}
+	}
+}
+
 test.onlyIf { mod_brand == 'fabric' && stonecutter.eval(mcVersion, ">= 1.18.0") }
 compileTestJava.onlyIf { mod_brand == 'fabric' && stonecutter.eval(mcVersion, ">= 1.18.0") }
 
