@@ -60,6 +60,7 @@ customEntries:
   - versions/1.21.10-neoforge/gradle.properties
   - versions/1.21.10-forge/gradle.properties
   - versions/1.21.10-fabric/gradle.properties
+  - versions/1.21.11-forge/gradle.properties
   - versions/1.21.11-neoforge/gradle.properties
   - versions/1.21.11-fabric/gradle.properties
   - src/main/neoforge-resources/META-INF/mods.toml
