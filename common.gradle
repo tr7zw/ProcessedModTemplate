@@ -22,6 +22,11 @@ def mod_brand = (loom.platform.get() as String).toLowerCase()
 assert mod_brand in ['fabric', 'forge', 'neoforge']
 assert project.name.endsWith('-' + mod_brand)  // optional check
 
+// Only add pmd to latest versions of fabric
+if (mod_brand == 'fabric' && stonecutter.eval("${project.minecraft_version}", ">= 1.21.11")) {
+	apply plugin: 'pmd'
+}
+
 def mcVersion = "${project.minecraft_version}"
 
 stonecutter {
@@ -56,6 +61,18 @@ loom {
 		accessWidenerPath = file("$projectDir/src/main/resources/$id$.accesswidener")
 	}
 
+}
+
+if (mod_brand == 'fabric' && stonecutter.eval("${project.minecraft_version}", ">= 1.21.11")) {
+	pmd {
+		consoleOutput = true
+		toolVersion = "7.16.0"
+		rulesMinimumPriority = 5
+		ruleSets = []
+    	ruleSetFiles = files("${project.rootProject.rootDir}/pmd-rules.xml")
+		ignoreFailures = true
+		threads = Runtime.runtime.availableProcessors()
+	}
 }
 
 eclipse {

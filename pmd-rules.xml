@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="Custom PMD Rules"
+         description="Custom PMD ruleset"
+         xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0
+                             https://pmd.sourceforge.net/ruleset_2_0_0.xsd">
+
+    <!-- Include all errorprone rules, exclude unwanted ones -->
+    <rule ref="category/java/errorprone.xml">
+        <exclude name="ConstructorCallsOverridableMethod"/>
+        <exclude name="ReturnEmptyCollectionRatherThanNull" />
+        <exclude name="AvoidCatchingThrowable" />
+    </rule>
+
+</ruleset>

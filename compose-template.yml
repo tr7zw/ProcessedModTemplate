@@ -70,6 +70,7 @@ customEntries:
   - src/main/resources/pack.mcmeta
   - formatter.xml
   - common.gradle
+  - pmd-rules.xml
 availableFlags:
   - autopublish
   - modrinth
