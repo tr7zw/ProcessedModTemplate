@@ -1,25 +1,19 @@
 
 plugins {
-	id "dev.architectury.loom" version "1.13-SNAPSHOT" apply false
 	id 'net.fabricmc.fabric-loom' version "${loom_version}" apply false
 	id 'com.gradleup.shadow' version '9.0.0-beta4' apply false
 	id "com.diffplug.spotless" version "7.0.0.BETA4" apply false
-	id 'xyz.wagyourtail.jvmdowngrader' version '1.3.6' apply false
 	id "me.modmuss50.mod-publish-plugin" version "1.0.0" apply false
 	id 'maven-publish'
 }
 
 apply plugin: 'eclipse'
-apply plugin: "dev.architectury.loom"
+apply plugin: "net.fabricmc.fabric-loom"
 apply plugin: 'com.gradleup.shadow'
-if (stonecutter.eval("${project.minecraft_version}", "<= 1.20.4")) {
-	println "Applying JVM Downgrader for Minecraft version ${project.minecraft_version}"
-	apply plugin: 'xyz.wagyourtail.jvmdowngrader'
-}
 apply plugin: 'me.modmuss50.mod-publish-plugin'
 apply plugin: 'com.diffplug.spotless'
 
-def mod_brand = (loom.platform.get() as String).toLowerCase()
+def mod_brand = "fabric"
 assert mod_brand in ['fabric', 'forge', 'neoforge']
 assert project.name.endsWith('-' + mod_brand)  // optional check
 
@@ -40,19 +34,22 @@ stonecutter {
 }
 
 loom {
-	if (!(mod_brand == 'neoforge' || (mod_brand == 'forge' && stonecutter.eval(mcVersion, ">= 1.20.5")))) {
-		println "Creating refmap for version $mcVersion"
-		mixin {
-			useLegacyMixinAp = true
-			defaultRefmapName = "$id$.refmap.mixins.json"
+	if (stonecutter.eval("${project.minecraft_version}", "< 26.0")) {
+		if (!(mod_brand == 'neoforge' || (mod_brand == 'forge' && stonecutter.eval(mcVersion, ">= 1.20.5")))) {
+			println "Creating refmap for version $mcVersion"
+			mixin {
+				useLegacyMixinAp = true
+				defaultRefmapName = "$id$.refmap.mixins.json"
+			}
 		}
+		silentMojangMappingsLicense()
 	}
+
 	runConfigs.all {
 		// to make sure it generates all "Minecraft Client (:subproject_name)" applications
 		ideConfigGenerated = true
 		runDir '../../run'
 	}
-	silentMojangMappingsLicense()
 
 	if(file("${project.rootProject.rootDir}/src/main/resources/$id$.accesswidener").exists()){
 		accessWidenerPath = file("${project.rootProject.rootDir}/src/main/resources/$id$.accesswidener")
@@ -96,21 +93,25 @@ configurations.all {
 
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings loom.layered() {
-		officialMojangMappings()
-		if (stonecutter.eval(mcVersion, ">= 1.21.5")) {
-			parchment("org.parchmentmc.data:parchment-${rootProject.parchment_mc_version_21_5}:${rootProject.parchment_version_21_5}@zip")
-		} else if (stonecutter.eval(mcVersion, ">= 1.21.4")) {
-			parchment("org.parchmentmc.data:parchment-${rootProject.parchment_mc_version_21_4}:${rootProject.parchment_version_21_4}@zip")
-		} else if (stonecutter.eval(mcVersion, ">= 1.21.0")) {
-			parchment("org.parchmentmc.data:parchment-${rootProject.parchment_mc_version_21}:${rootProject.parchment_version_21}@zip")
-		} else if (stonecutter.eval(mcVersion, ">= 1.20.4")) {
-			parchment("org.parchmentmc.data:parchment-${rootProject.parchment_mc_version_20_4}:${rootProject.parchment_version_20_4}@zip")
-		} else if(stonecutter.eval(mcVersion, ">= 1.20.2")) {
-			parchment("org.parchmentmc.data:parchment-${rootProject.parchment_mc_version_20_2}:${rootProject.parchment_version_20_2}@zip")
-		} else if(stonecutter.eval(mcVersion, ">= 1.20.1")) {
-			parchment("org.parchmentmc.data:parchment-${rootProject.parchment_mc_version_20_1}:${rootProject.parchment_version_20_1}@zip")
+	if (stonecutter.eval("${project.minecraft_version}", "< 26.0")) {
+		mappings loom.layered() {
+			officialMojangMappings()
+			if (stonecutter.eval(mcVersion, ">= 1.21.5")) {
+				parchment("org.parchmentmc.data:parchment-${rootProject.parchment_mc_version_21_5}:${rootProject.parchment_version_21_5}@zip")
+			} else if (stonecutter.eval(mcVersion, ">= 1.21.4")) {
+				parchment("org.parchmentmc.data:parchment-${rootProject.parchment_mc_version_21_4}:${rootProject.parchment_version_21_4}@zip")
+			} else if (stonecutter.eval(mcVersion, ">= 1.21.0")) {
+				parchment("org.parchmentmc.data:parchment-${rootProject.parchment_mc_version_21}:${rootProject.parchment_version_21}@zip")
+			} else if (stonecutter.eval(mcVersion, ">= 1.20.4")) {
+				parchment("org.parchmentmc.data:parchment-${rootProject.parchment_mc_version_20_4}:${rootProject.parchment_version_20_4}@zip")
+			} else if(stonecutter.eval(mcVersion, ">= 1.20.2")) {
+				parchment("org.parchmentmc.data:parchment-${rootProject.parchment_mc_version_20_2}:${rootProject.parchment_version_20_2}@zip")
+			} else if(stonecutter.eval(mcVersion, ">= 1.20.1")) {
+				parchment("org.parchmentmc.data:parchment-${rootProject.parchment_mc_version_20_1}:${rootProject.parchment_version_20_1}@zip")
+			}
 		}
+	} else {
+		loom.noIntermediateMappings()
 	}
 
 	compileOnly "org.projectlombok:lombok:${lombok_version}"
@@ -147,15 +148,25 @@ dependencies {
 	</mixinextras>
 
 	if (mod_brand == 'fabric') {
-		modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
+		if (stonecutter.eval("${project.minecraft_version}", "< 26.0")) {
+			modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
 
-		modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
-		if(project.hasProperty('mod_menu_compile_only')) {
-    		modCompileOnly "maven.modrinth:modmenu:${project.mod_menu_release}"
-		} else if (stonecutter.eval(mcVersion, "= 1.21.5")) {
-			modImplementation 'terraformers:modmenu:14.0.0-rc2@jar'
+			modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+			if(project.hasProperty('mod_menu_compile_only')) {
+				modCompileOnly "maven.modrinth:modmenu:${project.mod_menu_release}"
+			} else if (stonecutter.eval(mcVersion, "= 1.21.5")) {
+				modImplementation 'terraformers:modmenu:14.0.0-rc2@jar'
+			} else {
+				modImplementation "maven.modrinth:modmenu:${project.mod_menu_release}"
+			}
 		} else {
-			modImplementation "maven.modrinth:modmenu:${project.mod_menu_release}"
+			implementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
+			implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+			if(project.hasProperty('mod_menu_compile_only')) {
+				compileOnly "maven.modrinth:modmenu:${project.mod_menu_release}"
+			} else {
+				implementation "maven.modrinth:modmenu:${project.mod_menu_release}"
+			}
 		}
 
 		testImplementation "net.fabricmc:fabric-loader-junit:${rootProject.fabric_loader_version}"
@@ -208,6 +219,7 @@ shadowJar {
 	}
 }
 
+/*
 remapJar {
 	dependsOn(processTestResources)
 	dependsOn(shadowJar)
@@ -235,6 +247,7 @@ remapJar {
 		}
 	}
 }
+*/
 
 if (stonecutter.eval(mcVersion, "<= 1.20.4")) {
 	jvmdg.shadePath = new kotlin.jvm.functions.Function1<String, String>() {
@@ -287,7 +300,8 @@ processResources {
 		"1.21.8": 63,
 		"1.21.9": 69,
 		"1.21.10": 69,
-		"1.21.11": 75
+		"1.21.11": 75,
+		"26.1-pre-1": 75
 	]
 	print "Using Minecraft version: $mcVersion with pack format number: ${versionsMap[mcVersion]}" 
 
@@ -384,35 +398,14 @@ tasks.withType(JavaCompile) {
 java {
 	// remapping the jars later for <= 1.20.4 to Java 17
 	// remapping the jars later for < 1.18 to Java 8
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
 	//withSourcesJar()
 }
 
 // Function to delete bin directory recursively
 def deleteBinDir(dir) {
     ant.delete(dir: dir, failonerror: false)
-}
-
-if (stonecutter.eval(mcVersion, "<= 1.20.4")) {
-	downgradeJar {
-		dependsOn shadowJar
-		if (stonecutter.eval(mcVersion, ">= 1.18.0")) {
-			downgradeTo = JavaVersion.VERSION_17
-		}
-		doLast {
-			def inputShadowFile = tasks.shadowJar.archiveFile.get().asFile
-			def outputDirectory = inputShadowFile.parent
-			def originalFileName = inputShadowFile.getName().substring(0, inputShadowFile.getName().length() - 4);
-			// Delete the shadowJar.archiveFile
-			delete shadowJar.archiveFile
-
-			// Renaming the generated file to the original name
-			def generatedFile = new File(outputDirectory, "${originalFileName}-downgraded-shaded.jar")
-			println "Renaming ${generatedFile} to ${inputShadowFile}"
-			generatedFile.renameTo(inputShadowFile)
-		}
-	}
 }
 
 def getFile(String relativePath) {
@@ -426,9 +419,9 @@ publishing {
             artifactId = "$name$"
             version = "${rootProject.mod_version}-${project.minecraft_version}-${mod_brand}-SNAPSHOT"
 
-            artifact(tasks.named("remapJar").map { it.archiveFile.get().asFile }) {
-                extension = "jar"
-            }
+            //artifact(tasks.named("remapJar").map { it.archiveFile.get().asFile }) {
+            //    extension = "jar"
+            //}
         }
 		
     }
@@ -453,7 +446,7 @@ tasks.named("publishMods") {
 publishMods {
 
     // Set the main file to be uploaded
-    file = tasks.remapJar.archiveFile
+    //file = tasks.remapJar.archiveFile
  
     changelog = file("${project.rootProject.rootDir}/changelog.md").exists() ? file("${project.rootProject.rootDir}/changelog.md").text : "Allan, please add details! (tr messed up the changelog)"
  

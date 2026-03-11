@@ -12,11 +12,15 @@ pluginManagement {
         mavenCentral()
 		maven{ url "https://maven.kikugie.dev/snapshots"}
         maven{ url "https://maven.kikugie.dev/releases"}
+		maven {
+			name = 'Fabric'
+			url = 'https://maven.fabricmc.net/'
+		}
     }
 }
 
 plugins {
-    id("dev.kikugie.stonecutter") version "0.8-alpha.8"
+    id("dev.kikugie.stonecutter") version "${stonecutter_version}"
     id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 	id "com.diffplug.spotless" version "7.0.0.BETA4" apply false
 	// This dependency is only used to determine the state of the Git working tree so that build artifacts can be
@@ -99,13 +103,22 @@ stonecutter {
 	kotlinController = false
     centralScript = "common.gradle"
 
-    // TODO Disable any versions you don't want to support anb enable any versions you want to support
-    // The versions listed here, commented out or otherwise, all have pre-made gradle.properties.
     create(getRootProject()) {
-		def settings = new JsonSlurper().parseText(file('settings.json').text)
-		for (String version : settings.versions) {
-			vers("$version","$version".split("-")[0])
+
+		if (file('legacy.json').exists() && !file('skipLegacy').exists()) {
+			// Legacy versions
+			def legacySettings = new JsonSlurper().parseText(file('legacy.json').text)
+			for (String ver : legacySettings.versions) {
+				version("$ver","$ver".split("-")[0])
+			}
 		}
+
+		// Modern versions
+		def modernSettings = new JsonSlurper().parseText(file('modern.json').text)
+		for (String ver : modernSettings.versions) {
+			version("$ver","$ver".split("-")[0]).buildscript("commonLoom.gradle")
+		}
+
 		// read from versions/mainProject file
 		vcsVersion = file('versions/mainProject').text.trim()
     }

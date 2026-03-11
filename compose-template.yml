@@ -63,6 +63,7 @@ customEntries:
   - versions/1.21.11-forge/gradle.properties
   - versions/1.21.11-neoforge/gradle.properties
   - versions/1.21.11-fabric/gradle.properties
+  - versions/26.1-fabric/gradle.properties
   - src/main/neoforge-resources/META-INF/mods.toml
   - src/main/neoforge-resources/META-INF/neoforge.mods.toml
   - src/main/forge-resources/META-INF/mods.toml
@@ -70,6 +71,7 @@ customEntries:
   - src/main/resources/pack.mcmeta
   - formatter.xml
   - common.gradle
+  - commonLoom.gradle
   - pmd-rules.xml
 availableFlags:
   - autopublish
