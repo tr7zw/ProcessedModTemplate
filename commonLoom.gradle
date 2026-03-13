@@ -134,7 +134,7 @@ dependencies {
 		changing = true
 	}
 	</includeLibs>
-	modImplementation "dev.tr7zw:TRender:${rootProject.trender_version}-${project.minecraft_version}-${mod_brand}-SNAPSHOT@jar"
+	implementation "dev.tr7zw:TRender:${rootProject.trender_version}-${project.minecraft_version}-${mod_brand}-SNAPSHOT@jar"
 	</addTRenderLib>
 
 	<addTRansitionLib>
@@ -143,14 +143,14 @@ dependencies {
 		changing = true
 	}
 	</includeLibs>
-	modImplementation "dev.tr7zw:TRansition:${rootProject.transition_version}-${project.minecraft_version}-${mod_brand}-SNAPSHOT@jar"
+	implementation "dev.tr7zw:TRansition:${rootProject.transition_version}-${project.minecraft_version}-${mod_brand}-SNAPSHOT@jar"
 	</addTRansitionLib>
 	<mixinextras>
 	<includeLibs>
 	if (mod_brand == 'forge') {
     	compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:${rootProject.mixin_extras_version}"))
     	include("io.github.llamalad7:mixinextras-forge:${rootProject.mixin_extras_version}")
-		modImplementation("io.github.llamalad7:mixinextras-forge:${rootProject.mixin_extras_version}")
+		implementation("io.github.llamalad7:mixinextras-forge:${rootProject.mixin_extras_version}")
 	}
 	</includeLibs>
 	</mixinextras>
