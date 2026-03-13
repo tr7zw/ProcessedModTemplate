@@ -1,9 +1,9 @@
 stonecutter {
-    replace("getResourceLocation", "getResourceLocation") // Do not rename this method
     replacements.string(current.parsed >= "1.21.9") {
         replace("PlayerRenderState", "AvatarRenderState")
     }
     replacements.string(current.parsed >= "1.21.11") {
+        replace("getResourceLocation", "getResourceLocation") // Do not rename this method
         replace("ResourceLocation", "Identifier")
         replace("ResourceLocationParameter", "ResourceLocationParameter")
     }
