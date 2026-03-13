@@ -31,12 +31,19 @@ if (mod_brand == 'fabric' && stonecutter.eval("${project.minecraft_version}", ">
 def mcVersion = "${project.minecraft_version}"
 
 stonecutter {
-	    constants.match(
+	constants.match(
         mod_brand,
         "fabric",   // != "loader" -> false
         "neoforge", // == "loader" -> true
         "forge",    // != "loader" -> false
     )
+
+	if (file("${project.rootProject.rootDir}/replacements.gradle").exists()) {
+		apply from: "${project.rootProject.rootDir}/replacements.gradle"
+	}
+	if (file("${project.rootProject.rootDir}/globalReplacements.gradle").exists()) {
+		apply from: "${project.rootProject.rootDir}/globalReplacements.gradle"
+	}
 }
 
 loom {

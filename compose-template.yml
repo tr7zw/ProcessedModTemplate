@@ -72,6 +72,7 @@ customEntries:
   - formatter.xml
   - common.gradle
   - commonLoom.gradle
+  - globalReplacements.gradle
   - pmd-rules.xml
 availableFlags:
   - autopublish
