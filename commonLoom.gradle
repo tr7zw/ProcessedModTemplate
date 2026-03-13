@@ -427,9 +427,9 @@ publishing {
             artifactId = "$name$"
             version = "${rootProject.mod_version}-${project.minecraft_version}-${mod_brand}-SNAPSHOT"
 
-            //artifact(tasks.named("remapJar").map { it.archiveFile.get().asFile }) {
-            //    extension = "jar"
-            //}
+            artifact(tasks.named("jar").map { it.archiveFile.get().asFile }) {
+                extension = "jar"
+            }
         }
 		
     }
