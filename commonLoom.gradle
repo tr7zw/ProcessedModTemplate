@@ -227,16 +227,10 @@ shadowJar {
 	}
 }
 
-/*
-remapJar {
+jar {
 	dependsOn(processTestResources)
 	dependsOn(shadowJar)
-	if (stonecutter.eval(mcVersion, "<= 1.20.4")) {
-		dependsOn(shadeDowngradedApi)
-		input = shadeDowngradedApi.archiveFile
-	} else {
-		input = shadowJar.archiveFile
-	}
+	//input = shadowJar.archiveFile
 
 	if (mod_brand == 'forge') {
 		manifest {
@@ -247,15 +241,11 @@ remapJar {
 	}
 
 	doLast {
-		// Delete the shadowJar.archiveFile after remapJar task is executed
-		delete shadowJar.archiveFile
-		if (stonecutter.eval(mcVersion, "<= 1.20.4")) {
-			delete shadeDowngradedApi.archiveFile
-			delete downgradeJar.archiveFile
-		}
+		// Rename the shadow jar to the normal jar, effectively replacing it.
+		delete archiveFile
+		shadowJar.archiveFile.get().asFile.renameTo(archiveFile.get().asFile)
 	}
 }
-*/
 
 if (stonecutter.eval(mcVersion, "<= 1.20.4")) {
 	jvmdg.shadePath = new kotlin.jvm.functions.Function1<String, String>() {
