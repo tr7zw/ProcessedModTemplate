@@ -5,5 +5,6 @@ stonecutter {
     replacements.string(current.parsed >= "1.21.11") {
         replace("ResourceLocation", "Identifier")
         replace("ResourceLocationParameter", "ResourceLocationParameter")
+        replace("getResourceLocation", "getResourceLocation") // Do not rename this method from the global logic
     }
 }
