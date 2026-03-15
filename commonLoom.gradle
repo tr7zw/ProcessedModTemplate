@@ -218,19 +218,19 @@ if (getFile('dependencies.gradle').exists()) {
 }
 
 shadowJar {
+	dependsOn(jar)
 	configurations = [project.configurations.inc]
 	relocate 'dev.tr7zw.util', '$relocationpackage$.util'
 	relocate 'dev.tr7zw.config', '$relocationpackage$.config'
 	relocate 'io.sentry', 'dev.tr7zw.lib.sentry'
-	if (stonecutter.eval(mcVersion, "<= 1.20.4")) {
-		finalizedBy("shadeDowngradedApi")
+	doLast {
+		// Rename the shadow jar to the normal jar, effectively replacing it.
+		delete jar.archiveFile
+		shadowJar.archiveFile.get().asFile.renameTo(archiveFile.get().asFile)
 	}
 }
 
 jar {
-	dependsOn(processTestResources)
-	dependsOn(shadowJar)
-	//input = shadowJar.archiveFile
 
 	if (mod_brand == 'forge') {
 		manifest {
@@ -240,11 +240,6 @@ jar {
 		}
 	}
 
-	doLast {
-		// Rename the shadow jar to the normal jar, effectively replacing it.
-		delete archiveFile
-		shadowJar.archiveFile.get().asFile.renameTo(archiveFile.get().asFile)
-	}
 }
 
 if (stonecutter.eval(mcVersion, "<= 1.20.4")) {
