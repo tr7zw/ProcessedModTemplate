@@ -295,7 +295,7 @@ processResources {
 		"1.21.9": 69,
 		"1.21.10": 69,
 		"1.21.11": 75,
-		"26.1-pre-1": 75
+		"26.1-rc-2": 75
 	]
 	print "Using Minecraft version: $mcVersion with pack format number: ${versionsMap[mcVersion]}" 
 
