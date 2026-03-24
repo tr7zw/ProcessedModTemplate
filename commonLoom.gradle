@@ -1,7 +1,7 @@
 
 plugins {
 	id 'net.fabricmc.fabric-loom' version "${loom_version}" apply false
-	id 'com.gradleup.shadow' version '9.0.0-beta4' apply false
+	id 'com.gradleup.shadow' version '9.1.0' apply false
 	id "com.diffplug.spotless" version "7.0.0.BETA4" apply false
 	id "me.modmuss50.mod-publish-plugin" version "1.0.0" apply false
 	id 'maven-publish'
@@ -225,15 +225,22 @@ tasks.register('extractManifest', Copy) {
     }
 
     include 'META-INF/MANIFEST.MF'
+	include 'fabric.mod.json'
 
     into layout.buildDirectory.dir('tmp')
 }
 
 shadowJar {
+	duplicatesStrategy(DuplicatesStrategy.FAIL)
 	dependsOn(tasks.jar)
 	dependsOn(tasks.named('extractManifest'))
     manifest.from(layout.buildDirectory.file('tmp/META-INF/MANIFEST.MF'))
-	from(tasks.jar.outputs.files)
+	// workaround yeeting the main sourceset from getting included... wtf shadow
+    mainSpec.sourcePaths.clear()
+
+	// just working with the actual built jar, not the unprocessed sourceset output
+    from(zipTree(tasks.jar.archiveFile))
+
 	configurations = [project.configurations.inc]
 	relocate 'dev.tr7zw.util', '$relocationpackage$.util'
 	relocate 'dev.tr7zw.config', '$relocationpackage$.config'
