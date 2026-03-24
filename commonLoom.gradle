@@ -217,8 +217,22 @@ if (getFile('dependencies.gradle').exists()) {
     apply from: 'dependencies.gradle.kts'
 }
 
+tasks.register('extractManifest', Copy) {
+    dependsOn tasks.named('jar')
+
+    from {
+        zipTree(tasks.named('jar').get().archiveFile)
+    }
+
+    include 'META-INF/MANIFEST.MF'
+
+    into layout.buildDirectory.dir('tmp')
+}
+
 shadowJar {
 	dependsOn(tasks.jar)
+	dependsOn(tasks.named('extractManifest'))
+    manifest.from(layout.buildDirectory.file('tmp/META-INF/MANIFEST.MF'))
 	from(tasks.jar.outputs.files)
 	configurations = [project.configurations.inc]
 	relocate 'dev.tr7zw.util', '$relocationpackage$.util'
