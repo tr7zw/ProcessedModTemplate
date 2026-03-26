@@ -10,8 +10,6 @@ pluginManagement {
         }
         gradlePluginPortal()
         mavenCentral()
-		maven{ url "https://maven.kikugie.dev/snapshots"}
-        maven{ url "https://maven.kikugie.dev/releases"}
 		maven {
 			name = 'Fabric'
 			url = 'https://maven.fabricmc.net/'
