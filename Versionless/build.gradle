@@ -1,4 +1,5 @@
 apply plugin: 'java'
+apply plugin: 'maven-publish'
 
 base {
     archivesName = rootProject.archives_base_name + "-versionless"
@@ -27,4 +28,30 @@ java {
     // remapping the jars later for <= 1.17.1 to Java 8
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId = group
+            artifactId = "$name$-versionless"
+            version = "${rootProject.mod_version}-SNAPSHOT"
+
+            artifact(tasks.named("jar").map { it.archiveFile.get().asFile }) {
+                extension = "jar"
+            }
+        }
+		
+    }
+    repositories {
+        maven {
+            name = 'NexusSnapshots'
+            url = uri("https://maven.tr7zw.dev/repository/maven-snapshots/")
+
+            credentials {
+                username = project.hasProperty("nexusUsername") ? project.nexusUsername : System.getenv("NEXUS_USERNAME")
+                password = project.hasProperty("nexusPassword") ? project.nexusPassword : System.getenv("NEXUS_PASSWORD")
+            }
+        }
+    }
 }
