@@ -21,6 +21,10 @@ dependencies {
     testCompileOnly "org.projectlombok:lombok:${lombok_version}"
     testAnnotationProcessor "org.projectlombok:lombok:${lombok_version}"
 
+    <addTRansitionLib>
+	compileOnly "dev.tr7zw:TRansition-versionless:${rootProject.transition_version}-SNAPSHOT@jar"
+	</addTRansitionLib>
+
     $dependencies$
 }
 
