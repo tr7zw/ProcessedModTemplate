@@ -33,7 +33,7 @@ java {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            groupId = group
+            groupId = "$group$"
             artifactId = "$name$-versionless"
             version = "${rootProject.mod_version}-SNAPSHOT"
 
