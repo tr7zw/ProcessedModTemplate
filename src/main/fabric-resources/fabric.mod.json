@@ -29,8 +29,7 @@
         "${fabric_api_name}": "*"
     },
     "breaks": {
-        "tlskincape": "*",
-        "ichor": "*"$breaks$
+        "tlskincape": "*"$breaks$
     },
     "custom": {
         "modmenu": {
