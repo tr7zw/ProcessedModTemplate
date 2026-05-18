@@ -88,3 +88,4 @@ availableFlags:
   - includeLibs
   - addTRenderLib
   - addTRansitionLib
+  - splitEnv

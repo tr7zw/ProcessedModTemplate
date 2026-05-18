@@ -47,6 +47,16 @@ stonecutter {
 }
 
 loom {
+	<splitEnv>
+	splitEnvironmentSourceSets()
+
+	mods {
+		"$id$" {
+			sourceSet sourceSets.main
+			sourceSet sourceSets.client
+		}
+	}
+	</splitEnv>
 	if (!(mod_brand == 'neoforge' || (mod_brand == 'forge' && stonecutter.eval(mcVersion, ">= 1.20.5")))) {
 		println "Creating refmap for version $mcVersion"
 		mixin {
