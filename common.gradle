@@ -348,19 +348,7 @@ sourceSets.each {
 	it.java.destinationDirectory = dir
 }
 
-afterEvaluate { project ->
-	project.tasks.withType(JavaExec).configureEach { task ->
-		if (task.name.startsWith("runClient")) {
-			task.doFirst {
-				def binDir = project.file('bin')
-				if (binDir.exists()) {
-					deleteBinDir(binDir)
-				}
 
-			}
-		}
-	}
-}
 base {
 	archivesName = rootProject.archives_base_name
 }
@@ -404,11 +392,6 @@ java {
 	sourceCompatibility = JavaVersion.VERSION_21
 	targetCompatibility = JavaVersion.VERSION_21
 	//withSourcesJar()
-}
-
-// Function to delete bin directory recursively
-def deleteBinDir(dir) {
-    ant.delete(dir: dir, failonerror: false)
 }
 
 if (stonecutter.eval(mcVersion, "<= 1.20.4")) {
