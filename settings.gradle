@@ -14,6 +14,10 @@ pluginManagement {
 			name = 'Fabric'
 			url = 'https://maven.fabricmc.net/'
 		}
+		maven {
+			name = 'NeoForged'
+			url = 'https://maven.neoforged.net/releases'
+		}
     }
 }
 
@@ -80,7 +84,8 @@ gradle.beforeProject { Project project ->
 				jackson()
 			}
 			json {
-				target '**/*.json' 
+				target '**/*.json'
+				targetExclude '**/build/**', '**/.gradle/**', '**/run/**'
 				gson()
 			}
 			flexmark {
@@ -114,7 +119,8 @@ stonecutter {
 		// Modern versions
 		def modernSettings = new JsonSlurper().parseText(file('modern.json').text)
 		for (String ver : modernSettings.versions) {
-			version("$ver","$ver".split("-")[0]).buildscript("commonLoom.gradle")
+			def scriptName = ver.endsWith('-fabric') ? 'commonLoom.gradle' : ver.endsWith('-neoforge') ? 'commonNeoGradle.gradle' : 'common.gradle'
+			version("$ver","$ver".split("-")[0]).buildscript(scriptName)
 		}
 
 		// read from versions/mainProject file

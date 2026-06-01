@@ -65,14 +65,18 @@ customEntries:
   - versions/1.21.11-fabric/gradle.properties
   - versions/26.1-fabric/gradle.properties
   - versions/26.2-fabric/gradle.properties
+  - versions/26.1-neoforge/gradle.properties
   - src/main/neoforge-resources/META-INF/mods.toml
   - src/main/neoforge-resources/META-INF/neoforge.mods.toml
   - src/main/forge-resources/META-INF/mods.toml
   - src/main/fabric-resources/fabric.mod.json
   - src/main/resources/pack.mcmeta
   - formatter.xml
+  - buildSrc/build.gradle
+  - buildSrc/src/main/groovy/dev/tr7zw/TemplateBuildLogic.groovy
   - common.gradle
   - commonLoom.gradle
+  - commonNeoGradle.gradle
   - globalReplacements.gradle
   - pmd-rules.xml
 availableFlags:

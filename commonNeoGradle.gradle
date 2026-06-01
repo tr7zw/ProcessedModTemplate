@@ -1,0 +1,133 @@
+import dev.tr7zw.TemplateBuildLogic
+import org.gradle.api.JavaVersion
+import org.gradle.jvm.toolchain.JavaLanguageVersion
+
+plugins {
+	id 'net.neoforged.gradle.userdev' version "${neogradle_version}" apply false
+	id 'com.gradleup.shadow' version '9.1.0' apply false
+	id "com.diffplug.spotless" version "7.0.0.BETA4" apply false
+	id "me.modmuss50.mod-publish-plugin" version "1.1.0" apply false
+	id 'maven-publish'
+}
+
+apply plugin: 'eclipse'
+apply plugin: 'com.gradleup.shadow'
+apply plugin: 'me.modmuss50.mod-publish-plugin'
+apply plugin: 'com.diffplug.spotless'
+
+def mod_brand = 'neoforge'
+assert project.name.endsWith('-' + mod_brand)
+
+def mcVersion = "${project.minecraft_version}"
+
+apply plugin: 'net.neoforged.gradle.userdev'
+
+TemplateBuildLogic.configureStonecutter(project, mod_brand)
+TemplateBuildLogic.configurePmd(project, mod_brand, mcVersion)
+TemplateBuildLogic.configureEclipseAndConfigurations(project)
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(25)
+	}
+}
+
+runs {
+	configureEach {
+		workingDirectory file('../../run')
+	}
+}
+
+dependencies {
+	TemplateBuildLogic.addLombokDependencies(project)
+
+	implementation "net.neoforged:neoforge:${project.neoforge_version}"
+	TemplateBuildLogic.addOptionalTemplateLibraries(project, mod_brand, 'implementation', 'implementation')
+
+	$neoforge_dependencies$
+
+	$dependencies$
+
+	inc project(":$versionlessname$")
+}
+
+sourceSets.main.resources.srcDirs += "${project.rootDir}/src/main/neoforge-resources"
+
+TemplateBuildLogic.applyOptionalDependencyScript(project)
+
+shadowJar {
+	duplicatesStrategy(DuplicatesStrategy.FAIL)
+	dependsOn(tasks.jar)
+	configurations = [project.configurations.inc]
+	relocate 'dev.tr7zw.util', '$relocationpackage$.util'
+	relocate 'dev.tr7zw.config', '$relocationpackage$.config'
+	relocate 'io.sentry', 'dev.tr7zw.lib.sentry'
+	doLast {
+		delete jar.archiveFile
+		archiveFile.get().asFile.renameTo(jar.archiveFile.get().asFile)
+	}
+}
+
+jar {
+	finalizedBy shadowJar
+}
+
+tasks.matching { it.name == 'reobfJar' }.configureEach {
+	dependsOn shadowJar
+}
+
+def neoforgeVersionRange = project.hasProperty('neo_version_range') ? project.neo_version_range : ''
+def neoforgeLoaderVersion = project.hasProperty('loader_version_range_neoforge') ? project.loader_version_range_neoforge : ''
+def forgeLoaderVersion = project.hasProperty('loader_version_range_forge') ? project.loader_version_range_forge : ''
+def fabricApiName = project.hasProperty('fabric_api_name') ? project.fabric_api_name : ''
+def replaceProperties = [
+		minecraft_version: minecraft_version,
+		minecraft_version_range_forge: minecraft_dependency,
+		minecraft_version_range_neoforge: minecraft_dependency,
+		minecraft_version_range_fabric: minecraft_dependency,
+		loader_version_range_neoforge: neoforgeLoaderVersion,
+		loader_version_range_forge: forgeLoaderVersion,
+		neo_version_range: neoforgeVersionRange,
+		fabric_entrypoint: "$fabric_entrypoint$",
+		fabric_modmenu_entrypoint: "$fabric_modmenu_entrypoint$",
+		fabric_api_name: fabricApiName,
+		description: "$description$",
+		homepage_url: "$homepageUrl$",
+		sources_url: "$sourcesUrl$",
+		issues_url: "$issuesUrl$",
+		license_name: "$licenseName$",
+		mod_id: "$id$",
+		mod_name: "$name$",
+		version: "$version$${gradle.ext.versionMetadata}",
+		mod_author: "$author$",
+]
+TemplateBuildLogic.configureProcessResources(project, mod_brand, mcVersion, TemplateBuildLogic.defaultPackFormats(), replaceProperties, "$licensename$")
+TemplateBuildLogic.configureSourceSetsAndRunCleanup(project)
+TemplateBuildLogic.configureCoordinatesRepositoriesAndJava(project, mod_brand, JavaVersion.VERSION_25)
+
+def publicationTaskName = tasks.names.contains('reobfJar') ? 'reobfJar' : 'jar'
+TemplateBuildLogic.configurePublishing(project, mod_brand, publicationTaskName)
+
+<autopublish>
+publishMods {
+	TemplateBuildLogic.configurePublishModsBase(delegate, project, mod_brand, tasks.named(publicationTaskName).get().archiveFile)
+
+	<curseforge>
+	curseforge {
+		accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
+		projectId = "$curseforgeid$"
+		projectSlug = "$id$"
+		TemplateBuildLogic.configureCurseforgeDefaults(delegate, project, mod_brand, mcVersion, true)
+		$curseforge_dependencies$
+	}
+	</curseforge>
+	<modrinth>
+	modrinth {
+		accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+		projectId = "$modrinthid$"
+		TemplateBuildLogic.configureModrinthDefaults(delegate, project, mod_brand)
+		$modrinth_dependencies$
+	}
+	</modrinth>
+}
+</autopublish>

@@ -1,4 +1,6 @@
 
+import dev.tr7zw.TemplateBuildLogic
+
 plugins {
 	id 'net.fabricmc.fabric-loom' version "${loom_version}" apply false
 	id 'com.gradleup.shadow' version '9.1.0' apply false
@@ -17,29 +19,9 @@ def mod_brand = "fabric"
 assert mod_brand in ['fabric', 'forge', 'neoforge']
 assert project.name.endsWith('-' + mod_brand)  // optional check
 
-// Only add pmd to latest versions of fabric
-if (mod_brand == 'fabric' && stonecutter.eval("${project.minecraft_version}", ">= 1.21.11")) {
-	apply plugin: 'pmd'
-}
-
 def mcVersion = "${project.minecraft_version}"
 
-stonecutter {
-	constants.match(
-        mod_brand,
-        "fabric",   // != "loader" -> false
-        "neoforge", // == "loader" -> true
-        "forge",    // != "loader" -> false
-    )
-
-	if (file("${project.rootProject.rootDir}/replacements.gradle").exists()) {
-		apply from: "${project.rootProject.rootDir}/replacements.gradle"
-	}
-	if (file("${project.rootProject.rootDir}/globalReplacements.gradle").exists()) {
-		apply from: "${project.rootProject.rootDir}/globalReplacements.gradle"
-	}
-
-}
+TemplateBuildLogic.configureStonecutter(project, mod_brand)
 
 loom {
 	<splitEnv>
@@ -80,116 +62,17 @@ loom {
 
 }
 
-if (mod_brand == 'fabric' && stonecutter.eval("${project.minecraft_version}", ">= 1.21.11")) {
-	pmd {
-		consoleOutput = true
-		toolVersion = "7.16.0"
-		rulesMinimumPriority = 5
-		ruleSets = []
-    	ruleSetFiles = files("${project.rootProject.rootDir}/pmd-rules.xml")
-		ignoreFailures = true
-		threads = Runtime.runtime.availableProcessors()
-	}
-}
-
-eclipse {
-	project {
-		name "${parent.name}-${project.name}"
-
-		comment 'Gradle project ' + "${parent.name}-${project.name}"
-	}
-}
-
-configurations {
-	inc
-	implementation.extendsFrom inc
-}
-
-configurations.all {
-    resolutionStrategy.cacheChangingModulesFor 1, 'minutes'
-    resolutionStrategy.cacheDynamicVersionsFor 1, 'minutes'
-}
+TemplateBuildLogic.configurePmd(project, mod_brand, mcVersion)
+TemplateBuildLogic.configureEclipseAndConfigurations(project)
 
 dependencies {
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	if (stonecutter.eval("${project.minecraft_version}", "< 26.0")) {
-		mappings loom.layered() {
-			officialMojangMappings()
-			if (stonecutter.eval(mcVersion, ">= 1.21.5")) {
-				parchment("org.parchmentmc.data:parchment-${rootProject.parchment_mc_version_21_5}:${rootProject.parchment_version_21_5}@zip")
-			} else if (stonecutter.eval(mcVersion, ">= 1.21.4")) {
-				parchment("org.parchmentmc.data:parchment-${rootProject.parchment_mc_version_21_4}:${rootProject.parchment_version_21_4}@zip")
-			} else if (stonecutter.eval(mcVersion, ">= 1.21.0")) {
-				parchment("org.parchmentmc.data:parchment-${rootProject.parchment_mc_version_21}:${rootProject.parchment_version_21}@zip")
-			} else if (stonecutter.eval(mcVersion, ">= 1.20.4")) {
-				parchment("org.parchmentmc.data:parchment-${rootProject.parchment_mc_version_20_4}:${rootProject.parchment_version_20_4}@zip")
-			} else if(stonecutter.eval(mcVersion, ">= 1.20.2")) {
-				parchment("org.parchmentmc.data:parchment-${rootProject.parchment_mc_version_20_2}:${rootProject.parchment_version_20_2}@zip")
-			} else if(stonecutter.eval(mcVersion, ">= 1.20.1")) {
-				parchment("org.parchmentmc.data:parchment-${rootProject.parchment_mc_version_20_1}:${rootProject.parchment_version_20_1}@zip")
-			}
-		}
-	} else {
-		loom.noIntermediateMappings()
-	}
-
-	compileOnly "org.projectlombok:lombok:${lombok_version}"
-	annotationProcessor "org.projectlombok:lombok:${lombok_version}"
-	
-	testCompileOnly "org.projectlombok:lombok:${lombok_version}"
-	testAnnotationProcessor "org.projectlombok:lombok:${lombok_version}"
-
-	<addTRenderLib>
-	<includeLibs>
-	include("dev.tr7zw:TRender:${rootProject.trender_version}-${project.minecraft_version}-${mod_brand}-SNAPSHOT@jar") {
-		changing = true
-	}
-	</includeLibs>
-	implementation "dev.tr7zw:TRender:${rootProject.trender_version}-${project.minecraft_version}-${mod_brand}-SNAPSHOT@jar"
-	</addTRenderLib>
-
-	<addTRansitionLib>
-	<includeLibs>
-	include("dev.tr7zw:TRansition:${rootProject.transition_version}-${project.minecraft_version}-${mod_brand}-SNAPSHOT@jar") {
-		changing = true
-	}
-	</includeLibs>
-	implementation "dev.tr7zw:TRansition:${rootProject.transition_version}-${project.minecraft_version}-${mod_brand}-SNAPSHOT@jar"
-	</addTRansitionLib>
-	<mixinextras>
-	<includeLibs>
-	if (mod_brand == 'forge') {
-    	compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:${rootProject.mixin_extras_version}"))
-    	include("io.github.llamalad7:mixinextras-forge:${rootProject.mixin_extras_version}")
-		implementation("io.github.llamalad7:mixinextras-forge:${rootProject.mixin_extras_version}")
-	}
-	</includeLibs>
-	</mixinextras>
+	TemplateBuildLogic.addLoomMinecraftAndMappings(project, mcVersion, true)
+	TemplateBuildLogic.addLombokDependencies(project)
+	TemplateBuildLogic.addOptionalTemplateLibraries(project, mod_brand, 'implementation', 'implementation')
 
 	if (mod_brand == 'fabric') {
-		if (stonecutter.eval("${project.minecraft_version}", "< 26.0")) {
-			modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
-
-			modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
-			if(project.hasProperty('mod_menu_compile_only')) {
-				modCompileOnly "maven.modrinth:modmenu:${project.mod_menu_release}"
-			} else if (stonecutter.eval(mcVersion, "= 1.21.5")) {
-				modImplementation 'terraformers:modmenu:14.0.0-rc2@jar'
-			} else {
-				modImplementation "maven.modrinth:modmenu:${project.mod_menu_release}"
-			}
-		} else {
-			implementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
-			implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
-			if(project.hasProperty('mod_menu_compile_only')) {
-				compileOnly "maven.modrinth:modmenu:${project.mod_menu_release}"
-			} else {
-				implementation "maven.modrinth:modmenu:${project.mod_menu_release}"
-			}
-		}
-
-		testImplementation "net.fabricmc:fabric-loader-junit:${rootProject.fabric_loader_version}"
-		testImplementation 'org.objenesis:objenesis:3.4'
+		TemplateBuildLogic.addFabricRuntimeDependencies(project, mcVersion, true)
+		TemplateBuildLogic.addFabricTestDependencies(project)
 
 		$fabric_dependencies$
 
@@ -222,58 +105,8 @@ dependencies {
 
 }
 
-if (getFile('dependencies.gradle').exists()) {
-    apply from: 'dependencies.gradle'
-} else if (getFile('dependencies.gradle.kts').exists()) {
-    apply from: 'dependencies.gradle.kts'
-}
-
-tasks.register('extractManifest', Copy) {
-    dependsOn tasks.named('jar')
-
-    from {
-        zipTree(tasks.named('jar').get().archiveFile)
-    }
-
-    include 'META-INF/MANIFEST.MF'
-	include 'fabric.mod.json'
-
-    into layout.buildDirectory.dir('tmp')
-}
-
-shadowJar {
-	duplicatesStrategy(DuplicatesStrategy.FAIL)
-	dependsOn(tasks.jar)
-	dependsOn(tasks.named('extractManifest'))
-    manifest.from(layout.buildDirectory.file('tmp/META-INF/MANIFEST.MF'))
-	// workaround yeeting the main sourceset from getting included... wtf shadow
-    mainSpec.sourcePaths.clear()
-
-	// just working with the actual built jar, not the unprocessed sourceset output
-    from(zipTree(tasks.jar.archiveFile))
-
-	configurations = [project.configurations.inc]
-	relocate 'dev.tr7zw.util', '$relocationpackage$.util'
-	relocate 'dev.tr7zw.config', '$relocationpackage$.config'
-	relocate 'io.sentry', 'dev.tr7zw.lib.sentry'
-	doLast {
-		// Rename the shadow jar to the normal jar, effectively replacing it.
-		delete jar.archiveFile
-		shadowJar.archiveFile.get().asFile.renameTo(jar.archiveFile.get().asFile)
-	}
-}
-
-jar {
-
-	if (mod_brand == 'forge') {
-		manifest {
-			attributes(
-				'MixinConfigs': "$id$.mixins.json"
-			)
-		}
-	}
-	finalizedBy shadowJar
-}
+TemplateBuildLogic.applyOptionalDependencyScript(project)
+TemplateBuildLogic.configureLoomJarShadowPipeline(project, mod_brand)
 
 if (stonecutter.eval(mcVersion, "<= 1.20.4")) {
 	jvmdg.shadePath = new kotlin.jvm.functions.Function1<String, String>() {
@@ -284,233 +117,47 @@ if (stonecutter.eval(mcVersion, "<= 1.20.4")) {
 	}
 }
 
-test.onlyIf { mod_brand == 'fabric' && stonecutter.eval(mcVersion, ">= 1.18.0") }
-compileTestJava.onlyIf { mod_brand == 'fabric' && stonecutter.eval(mcVersion, ">= 1.18.0") }
+TemplateBuildLogic.configureTestTasks(project, mod_brand, mcVersion)
 
-test {
-	useJUnitPlatform()
-}
-
-processResources {
-	dependsOn(stonecutterGenerate)
-	duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
-
-	def neoforgeVersionRange = project.hasProperty('neo_version_range') ? project.neo_version_range : ''
-	def neoforgeLoaderVersion = project.hasProperty('loader_version_range_neoforge') ? project.loader_version_range_neoforge : ''
-	def forgeLoaderVersion = project.hasProperty('loader_version_range_forge') ? project.loader_version_range_forge : ''
-	def fabricApiName = project.hasProperty('fabric_api_name') ? project.fabric_api_name : ''
-
-	def versionsMap = [
-		"1.8.9": 1,
-		"1.12.2": 3,
-		"1.15.0": 5,
-		"1.16.5": 6,
-		"1.17.1": 7,
-		"1.18.2": 8,
-		"1.19.2": 9,
-		"1.19.3": 12,
-		"1.19.4": 13,
-		"1.20.1": 15,
-		"1.20.2": 18,
-		"1.20.3": 21,
-		"1.20.4": 22,
-		"1.20.5": 32,
-		"1.20.6": 32,
-		"1.21.1": 34,
-		"1.21.2": 42,
-		"1.21.3": 42,
-		"1.21.4": 46,
-		"1.21.5": 55,
-		"1.21.6": 63,
-		"1.21.7": 63,
-		"1.21.8": 63,
-		"1.21.9": 69,
-		"1.21.10": 69,
-		"1.21.11": 75,
-		"26.1": 84,
-		"26.2-pre-1": 84
-	]
-	print "Using Minecraft version: $mcVersion with pack format number: ${versionsMap[mcVersion]}" 
-
-	var replaceProperties = [
-			minecraft_version   : minecraft_version, minecraft_version_range_forge: minecraft_dependency,
-			minecraft_version_range_neoforge         : minecraft_dependency,
-			minecraft_version_range_fabric: minecraft_dependency,
-			loader_version_range_neoforge: neoforgeLoaderVersion,
-			loader_version_range_forge: forgeLoaderVersion,
-			neo_version_range: neoforgeVersionRange,
-			fabric_entrypoint   : "$fabric_entrypoint$",
-			fabric_modmenu_entrypoint: "$fabric_modmenu_entrypoint$",
-			fabric_api_name: fabricApiName,
-			description		 : "$description$",
-			homepage_url		 : "$homepageUrl$",
-			sources_url		 : "$sourcesUrl$",
-			issues_url		 : "$issuesUrl$",
-			license_name: "$licenseName$",
-			mod_id              : "$id$", mod_name: "$name$", version: "$version$${gradle.ext.versionMetadata}",
-			mod_author         : "$author$", pack_format_number: versionsMap[mcVersion],
-	]
-	inputs.properties replaceProperties
-
-	filesMatching(['fabric.mod.json', 'META-INF/mods.toml', 'META-INF/neoforge.mods.toml', '**/pack.mcmeta']) {
-		expand replaceProperties + [project: project]
-	}
-
-	from "${project.rootDir}/$licensename$"
-
-	if (mod_brand != 'fabric') {
-		exclude {
-			it.file.name == 'fabric.mod.json'
-		}
-	}
-
-}
-
-sourceSets.each {
-	def dir = layout.buildDirectory.dir("sourcesSets/$it.name")
-	it.output.resourcesDir = dir
-	it.java.destinationDirectory = dir
-}
-
-afterEvaluate { project ->
-	project.tasks.withType(JavaExec).configureEach { task ->
-		if (task.name.startsWith("runClient")) {
-			task.doFirst {
-				def binDir = project.file('bin')
-				if (binDir.exists()) {
-					deleteBinDir(binDir)
-				}
-
-			}
-		}
-	}
-}
-base {
-	archivesName = rootProject.archives_base_name
-}
-version = mod_brand + "-" + rootProject.mod_version + "-mc" + project.minecraft_version + gradle.ext.versionMetadata
-group = rootProject.maven_group
-
-repositories {
-	// Add repositories to retrieve artifacts from in here.
-	// You should only use this when depending on other mods because
-	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
-	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
-	// for more information about repositories.
-	maven {
-		name = "tr7zw-proxy"
-		url "https://maven.tr7zw.dev/repository/maven-public/"
-	}
-	maven {
-		name = "tr7zw-tmp"
-		url "https://maven.tr7zw.dev/repository/maven-tmp/"
-	}
-	maven {
-		name = "Modrinth"
-		url = "https://api.modrinth.com/maven"
-		content {
-			includeGroup "maven.modrinth"
-		}
-	}
-	maven {
-		url "https://cursemaven.com"
-	}
-	mavenLocal()
-}
-
-tasks.withType(JavaCompile) {
-	options.encoding = "UTF-8"
-}
-
-java {
-	// remapping the jars later for <= 1.20.4 to Java 17
-	// remapping the jars later for < 1.18 to Java 8
-	sourceCompatibility = JavaVersion.VERSION_25
-	targetCompatibility = JavaVersion.VERSION_25
-	//withSourcesJar()
-}
-
-// Function to delete bin directory recursively
-def deleteBinDir(dir) {
-    ant.delete(dir: dir, failonerror: false)
-}
-
-def getFile(String relativePath) {
-    return new File(projectDir, relativePath)
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            groupId = group
-            artifactId = "$name$"
-            version = "${rootProject.mod_version}-${project.minecraft_version}-${mod_brand}-SNAPSHOT"
-
-            artifact(tasks.named("jar").map { it.archiveFile.get().asFile }) {
-                extension = "jar"
-            }
-        }
-		
-    }
-    repositories {
-        maven {
-            name = 'NexusSnapshots'
-            url = uri("https://maven.tr7zw.dev/repository/maven-snapshots/")
-
-            credentials {
-                username = project.hasProperty("nexusUsername") ? project.nexusUsername : System.getenv("NEXUS_USERNAME")
-                password = project.hasProperty("nexusPassword") ? project.nexusPassword : System.getenv("NEXUS_PASSWORD")
-            }
-        }
-    }
-}
-
-tasks.named("publishMods") {
-	onlyIf { !("${project.minecraft_version}".contains("w") || "${project.minecraft_version}".contains("rc") || "${project.minecraft_version}".contains("pre")) }
-}
+def neoforgeVersionRange = project.hasProperty('neo_version_range') ? project.neo_version_range : ''
+def neoforgeLoaderVersion = project.hasProperty('loader_version_range_neoforge') ? project.loader_version_range_neoforge : ''
+def forgeLoaderVersion = project.hasProperty('loader_version_range_forge') ? project.loader_version_range_forge : ''
+def fabricApiName = project.hasProperty('fabric_api_name') ? project.fabric_api_name : ''
+def replaceProperties = [
+		minecraft_version: minecraft_version,
+		minecraft_version_range_forge: minecraft_dependency,
+		minecraft_version_range_neoforge: minecraft_dependency,
+		minecraft_version_range_fabric: minecraft_dependency,
+		loader_version_range_neoforge: neoforgeLoaderVersion,
+		loader_version_range_forge: forgeLoaderVersion,
+		neo_version_range: neoforgeVersionRange,
+		fabric_entrypoint: "$fabric_entrypoint$",
+		fabric_modmenu_entrypoint: "$fabric_modmenu_entrypoint$",
+		fabric_api_name: fabricApiName,
+		description: "$description$",
+		homepage_url: "$homepageUrl$",
+		sources_url: "$sourcesUrl$",
+		issues_url: "$issuesUrl$",
+		license_name: "$licenseName$",
+		mod_id: "$id$",
+		mod_name: "$name$",
+		version: "$version$${gradle.ext.versionMetadata}",
+		mod_author: "$author$",
+]
+TemplateBuildLogic.configureProcessResources(project, mod_brand, mcVersion, TemplateBuildLogic.defaultPackFormats(), replaceProperties, "$licensename$")
+TemplateBuildLogic.configureSourceSetsAndRunCleanup(project)
+TemplateBuildLogic.configureCoordinatesRepositoriesAndJava(project, mod_brand, JavaVersion.VERSION_25)
+TemplateBuildLogic.configurePublishing(project, mod_brand, 'jar')
 
 <autopublish>
 publishMods {
-
-    // Set the main file to be uploaded
-    file = tasks.jar.archiveFile
- 
-    changelog = file("${project.rootProject.rootDir}/changelog.md").exists() ? file("${project.rootProject.rootDir}/changelog.md").text : "Allan, please add details! (tr messed up the changelog)"
- 
-    version = "${rootProject.mod_version}"
- 
-    type = STABLE
- 
-    displayName = "${rootProject.mod_version}-${project.minecraft_version} - " + (mod_brand == "fabric" ? "Fabric" : mod_brand == "forge" ? "Forge" : "NeoForge")
- 
-    modLoaders.add(mod_brand)
- 
-    dryRun = providers.environmentVariable("MODRINTH_TOKEN").getOrNull() == null || providers.environmentVariable("CURSEFORGE_TOKEN").getOrNull() == null || !file("${project.rootProject.rootDir}/changelog.md").exists()
-
-	maxRetries = 6 // aggresivly retry on fail
+	TemplateBuildLogic.configurePublishModsBase(delegate, project, mod_brand, tasks.jar.archiveFile)
 	<curseforge>
 	curseforge {
         accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
         projectId = "$curseforgeid$"
 		projectSlug = "$id$"
-        minecraftVersions.add("${project.minecraft_version}")
-		clientRequired = true
-		serverRequired = false
-		javaVersions.add(JavaVersion.VERSION_25)
-		if (project.minecraft_version == "1.21") {
-			minecraftVersions.add("1.21.1")
-		}
-		if (project.minecraft_version == "1.21.6") {
-			minecraftVersions.add("1.21.7")
-			minecraftVersions.add("1.21.8")
-		}
-		if (project.minecraft_version == "26.1") {
-			minecraftVersions.add("26.1.1")
-			minecraftVersions.add("26.1.2")
-		}
-		if (mod_brand == "fabric") {
-			requires("fabric-api")
-		}
+		TemplateBuildLogic.configureCurseforgeDefaults(delegate, project, mod_brand, mcVersion, true)
 		$curseforge_dependencies$
     }
 	</curseforge>
@@ -518,21 +165,7 @@ publishMods {
 	modrinth {
         accessToken = providers.environmentVariable("MODRINTH_TOKEN")
         projectId = "$modrinthid$"
-        minecraftVersions.add("${project.minecraft_version}")
-		if (project.minecraft_version == "1.21") {
-			minecraftVersions.add("1.21.1")
-		}
-		if (project.minecraft_version == "1.21.6") {
-			minecraftVersions.add("1.21.7")
-			minecraftVersions.add("1.21.8")
-		}
-		if (project.minecraft_version == "26.1") {
-			minecraftVersions.add("26.1.1")
-			minecraftVersions.add("26.1.2")
-		}
-		if (mod_brand == "fabric") {
-			requires("fabric-api")
-		}
+		TemplateBuildLogic.configureModrinthDefaults(delegate, project, mod_brand)
 		$modrinth_dependencies$
     }
 	</modrinth>
