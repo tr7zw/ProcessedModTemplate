@@ -35,6 +35,9 @@ java {
 runs {
 	configureEach {
 		workingDirectory file('../../run')
+		dependencies {
+			runtime project.configurations.inc
+		}
 	}
 }
 
@@ -55,9 +58,32 @@ sourceSets.main.resources.srcDirs += "${project.rootDir}/src/main/neoforge-resou
 
 TemplateBuildLogic.applyOptionalDependencyScript(project)
 
+tasks.register('extractManifest', Copy) {
+	dependsOn tasks.named('jar')
+
+	from {
+		zipTree(tasks.named('jar').get().archiveFile)
+	}
+
+	include 'META-INF/MANIFEST.MF'
+
+	into layout.buildDirectory.dir('tmp')
+}
+
+// NeoGradle runs use local runtime conventions; extend them with inc so dev mode sees bundled libs.
+configurations.matching { cfg ->
+	cfg.name in ['runtimeClasspath', 'mainLocalRuntime', 'mainLocalRunRuntime', 'runs']
+}.configureEach {
+	extendsFrom(configurations.inc)
+}
+
 shadowJar {
 	duplicatesStrategy(DuplicatesStrategy.FAIL)
 	dependsOn(tasks.jar)
+	dependsOn(tasks.named('extractManifest'))
+	manifest.from(layout.buildDirectory.file('tmp/META-INF/MANIFEST.MF'))
+	mainSpec.sourcePaths.clear()
+	from(zipTree(tasks.jar.archiveFile))
 	configurations = [project.configurations.inc]
 	relocate 'dev.tr7zw.util', '$relocationpackage$.util'
 	relocate 'dev.tr7zw.config', '$relocationpackage$.config'
@@ -74,6 +100,11 @@ jar {
 
 tasks.matching { it.name == 'reobfJar' }.configureEach {
 	dependsOn shadowJar
+	if (metaClass.hasProperty(delegate, 'input')) {
+		input = shadowJar.archiveFile
+	} else if (metaClass.hasProperty(delegate, 'inputFile')) {
+		inputFile = shadowJar.archiveFile
+	}
 }
 
 def neoforgeVersionRange = project.hasProperty('neo_version_range') ? project.neo_version_range : ''
