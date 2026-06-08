@@ -42,6 +42,19 @@ runs {
 }
 
 dependencies {
+	// Compatibility shim: some compose replacement blocks still use Loom-style names.
+	def deps = project.dependencies
+	if (deps.metaClass.respondsTo(deps, 'modCompileOnly', Object).isEmpty()) {
+		deps.metaClass.modCompileOnly = { Object notation ->
+			delegate.add('compileOnly', notation)
+		}
+	}
+	if (deps.metaClass.respondsTo(deps, 'modImplementation', Object).isEmpty()) {
+		deps.metaClass.modImplementation = { Object notation ->
+			delegate.add('implementation', notation)
+		}
+	}
+
 	TemplateBuildLogic.addLombokDependencies(project)
 
 	implementation "net.neoforged:neoforge:${project.neoforge_version}"
@@ -67,7 +80,7 @@ tasks.register('extractManifest', Copy) {
 
 	include 'META-INF/MANIFEST.MF'
 
-	into layout.buildDirectory.dir('tmp')
+	into layout.buildDirectory.dir('extractManifest')
 }
 
 // NeoGradle runs use local runtime conventions; extend them with inc so dev mode sees bundled libs.
@@ -81,7 +94,7 @@ shadowJar {
 	duplicatesStrategy(DuplicatesStrategy.FAIL)
 	dependsOn(tasks.jar)
 	dependsOn(tasks.named('extractManifest'))
-	manifest.from(layout.buildDirectory.file('tmp/META-INF/MANIFEST.MF'))
+	manifest.from(layout.buildDirectory.file('extractManifest/META-INF/MANIFEST.MF'))
 	mainSpec.sourcePaths.clear()
 	from(zipTree(tasks.jar.archiveFile))
 	configurations = [project.configurations.inc]
@@ -98,12 +111,46 @@ jar {
 	finalizedBy shadowJar
 }
 
-tasks.matching { it.name == 'reobfJar' }.configureEach {
+tasks.register('replaceJarWithJarJar') {
+	doLast {
+		def jarJarTask = tasks.findByName('jarJar')
+		if (jarJarTask == null) {
+			return
+		}
+
+		File allJar = jarJarTask.archiveFile.get().asFile
+		File baseJar = tasks.named('jar').get().archiveFile.get().asFile
+		if (!allJar.exists()) {
+			return
+		}
+		if (baseJar.exists()) {
+			delete baseJar
+		}
+		allJar.renameTo(baseJar)
+	}
+}
+
+tasks.matching { it.name == 'jarJar' }.configureEach {
 	dependsOn shadowJar
-	if (metaClass.hasProperty(delegate, 'input')) {
-		input = shadowJar.archiveFile
-	} else if (metaClass.hasProperty(delegate, 'inputFile')) {
-		inputFile = shadowJar.archiveFile
+	finalizedBy tasks.named('replaceJarWithJarJar')
+}
+
+tasks.matching { it.name == 'reobfJar' }.configureEach {
+	if (tasks.names.contains('jarJar')) {
+		dependsOn tasks.named('replaceJarWithJarJar')
+		def jarOutput = tasks.named('jar').flatMap { it.archiveFile }
+		if (metaClass.hasProperty(delegate, 'input')) {
+			input = jarOutput
+		} else if (metaClass.hasProperty(delegate, 'inputFile')) {
+			inputFile = jarOutput
+		}
+	} else {
+		dependsOn shadowJar
+		if (metaClass.hasProperty(delegate, 'input')) {
+			input = shadowJar.archiveFile
+		} else if (metaClass.hasProperty(delegate, 'inputFile')) {
+			inputFile = shadowJar.archiveFile
+		}
 	}
 }
 
@@ -134,6 +181,7 @@ def replaceProperties = [
 ]
 TemplateBuildLogic.configureProcessResources(project, mod_brand, mcVersion, TemplateBuildLogic.defaultPackFormats(), replaceProperties, "$licensename$")
 TemplateBuildLogic.configureSourceSetsAndRunCleanup(project)
+TemplateBuildLogic.configureTestTasks(project, mod_brand, mcVersion)
 TemplateBuildLogic.configureCoordinatesRepositoriesAndJava(project, mod_brand, JavaVersion.VERSION_25)
 
 def publicationTaskName = tasks.names.contains('reobfJar') ? 'reobfJar' : 'jar'

@@ -127,6 +127,16 @@ class TemplateBuildLogic {
     }
 
     static void configureTestTasks(Project project, String modBrand, String mcVersion) {
+        if (modBrand == 'neoforge') {
+            project.tasks.withType(org.gradle.api.tasks.testing.Test).configureEach {
+                enabled = false
+            }
+            project.tasks.matching { it.name in ['compileTestJava', 'processTestResources', 'testClasses', 'check'] }.configureEach {
+                it.enabled = false
+            }
+            return
+        }
+
         project.tasks.named('test').configure {
             onlyIf { modBrand == 'fabric' && project.stonecutter.eval(mcVersion, '>= 1.18.0') }
             useJUnitPlatform()
@@ -363,8 +373,14 @@ class TemplateBuildLogic {
         project.dependencies {
             <addTRenderLib>
             <includeLibs>
-            include("dev.tr7zw:TRender:${project.rootProject.trender_version}-${project.minecraft_version}-${modBrand}-SNAPSHOT@jar") {
-                changing = true
+            if (modBrand == 'neoforge' && project.stonecutter.eval(project.minecraft_version.toString(), '>= 26.0')) {
+                jarJar("dev.tr7zw:TRender:${project.rootProject.trender_version}-${project.minecraft_version}-${modBrand}-SNAPSHOT@jar") {
+                    changing = true
+                }
+            } else {
+                include("dev.tr7zw:TRender:${project.rootProject.trender_version}-${project.minecraft_version}-${modBrand}-SNAPSHOT@jar") {
+                    changing = true
+                }
             }
             </includeLibs>
             "${implementationConfiguration}"("dev.tr7zw:TRender:${project.rootProject.trender_version}-${project.minecraft_version}-${modBrand}-SNAPSHOT@jar")
@@ -372,8 +388,14 @@ class TemplateBuildLogic {
 
             <addTRansitionLib>
             <includeLibs>
-            include("dev.tr7zw:TRansition:${project.rootProject.transition_version}-${project.minecraft_version}-${modBrand}-SNAPSHOT@jar") {
-                changing = true
+            if (modBrand == 'neoforge' && project.stonecutter.eval(project.minecraft_version.toString(), '>= 26.0')) {
+                jarJar("dev.tr7zw:TRansition:${project.rootProject.transition_version}-${project.minecraft_version}-${modBrand}-SNAPSHOT@jar") {
+                    changing = true
+                }
+            } else {
+                include("dev.tr7zw:TRansition:${project.rootProject.transition_version}-${project.minecraft_version}-${modBrand}-SNAPSHOT@jar") {
+                    changing = true
+                }
             }
             </includeLibs>
             "${implementationConfiguration}"("dev.tr7zw:TRansition:${project.rootProject.transition_version}-${project.minecraft_version}-${modBrand}-SNAPSHOT@jar")
