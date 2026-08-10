@@ -6,7 +6,7 @@ plugins {
 	id 'net.neoforged.gradle.userdev' version "${neogradle_version}" apply false
 	id 'com.gradleup.shadow' version '9.1.0' apply false
 	id "com.diffplug.spotless" version "7.0.0.BETA4" apply false
-	id "me.modmuss50.mod-publish-plugin" version "1.1.0" apply false
+	id "me.modmuss50.mod-publish-plugin" version "2.2.0" apply false
 	id 'maven-publish'
 }
 
