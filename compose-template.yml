@@ -80,6 +80,7 @@ customEntries:
   - commonNeoGradle.gradle
   - globalReplacements.gradle
   - pmd-rules.xml
+  - CONTRIBUTING.md
 availableFlags:
   - autopublish
   - modrinth
