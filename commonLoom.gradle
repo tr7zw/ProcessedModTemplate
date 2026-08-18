@@ -60,6 +60,14 @@ loom {
 		accessWidenerPath = file("$projectDir/src/main/resources/$id$.accesswidener")
 	}
 
+	if(file("${project.rootProject.rootDir}/src/main/resources/$id$.classtweaker").exists()){
+		accessWidenerPath = file("${project.rootProject.rootDir}/src/main/resources/$id$.classtweaker")
+	}
+
+	if(file("$projectDir/src/main/resources/$id$.classtweaker").exists()){
+		accessWidenerPath = file("$projectDir/src/main/resources/$id$.classtweaker")
+	}
+
 }
 
 TemplateBuildLogic.configurePmd(project, mod_brand, mcVersion)
