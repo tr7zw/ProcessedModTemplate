@@ -195,9 +195,6 @@ class TemplateBuildLogic {
                 name = 'NeoForged'
                 url = 'https://maven.neoforged.net/releases'
             }
-            maven {
-                url 'https://cursemaven.com'
-            }
             mavenLocal()
         }
 
