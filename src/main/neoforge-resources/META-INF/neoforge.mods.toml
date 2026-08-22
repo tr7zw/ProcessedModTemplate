@@ -9,6 +9,8 @@ version="${version}"
 displayName="${mod_name}"
 displayURL="${homepage_url}"
 logoFile="icon.png"
+iconFile="icon.png"
+bannerFile="icon.png"
 authors="${mod_author}"
 description='''
 ${description}
