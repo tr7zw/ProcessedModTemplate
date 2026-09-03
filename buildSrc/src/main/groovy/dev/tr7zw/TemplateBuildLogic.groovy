@@ -275,6 +275,9 @@ class TemplateBuildLogic {
             manifest.from(project.layout.buildDirectory.file('tmp/META-INF/MANIFEST.MF'))
             mainSpec.sourcePaths.clear()
             from(project.zipTree(project.tasks.named('jar').get().archiveFile))
+            // The real output is the jar path, doLast renames the shadow jar onto it. Without this Gradle
+            // sees the missing -all.jar as unchanged and skips the merge whenever "jar" reruns on its own.
+            outputs.file(project.tasks.named('jar').map { it.archiveFile })
 
             configurations = [project.configurations.inc]
             relocate 'dev.tr7zw.util', '$relocationpackage$.util'
