@@ -251,6 +251,7 @@ class TemplateBuildLogic {
             onlyIf {
                 !("${project.minecraft_version}".contains('w') || "${project.minecraft_version}".contains('rc') || "${project.minecraft_version}".contains('pre'))
             }
+            dependsOn(project.tasks.named("shadowJar"))
         }
     }
 
