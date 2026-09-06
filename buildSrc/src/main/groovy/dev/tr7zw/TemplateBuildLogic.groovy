@@ -425,6 +425,12 @@ class TemplateBuildLogic {
         publishModsTarget.maxRetries = 6
     }
 
+    static void configurePublishTaskShadowDependency(Project project) {
+        project.tasks.matching { it.name in ['publishModrinth', 'publishCurseforge'] }.configureEach {
+            dependsOn(project.tasks.named('shadowJar'))
+        }
+    }
+
     static void configureCurseforgeDefaults(def curseforgeTarget, Project project, String modBrand, String mcVersion, boolean java25) {
         curseforgeTarget.minecraftVersions.add("${project.minecraft_version}")
         curseforgeTarget.clientRequired = true
