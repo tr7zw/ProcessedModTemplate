@@ -425,9 +425,12 @@ class TemplateBuildLogic {
         publishModsTarget.maxRetries = 6
     }
 
-    static void configurePublishTaskShadowDependency(Project project) {
+    static void configurePublishTaskShadowDependency(Project project, String modBrand) {
         project.tasks.matching { it.name in ['publishModrinth', 'publishCurseforge'] }.configureEach {
             dependsOn(project.tasks.named('shadowJar'))
+            if (modBrand == 'neoforge') {
+                dependsOn(project.tasks.named('jarJar'))
+            }
         }
     }
 

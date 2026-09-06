@@ -213,5 +213,5 @@ publishMods {
 	}
 	</modrinth>
 }
-TemplateBuildLogic.configurePublishTaskShadowDependency(project)
+TemplateBuildLogic.configurePublishTaskShadowDependency(project, mod_brand)
 </autopublish>
