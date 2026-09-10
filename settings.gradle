@@ -3,31 +3,20 @@ import org.ajoberstar.grgit.Grgit
 
 pluginManagement {
     repositories {
-        maven { url "https://maven.architectury.dev/" } // https://maven.tr7zw.dev/repository/maven-tmp/
 		maven {
             name = "tr7zw-proxy"
             url "https://maven.tr7zw.dev/repository/maven-public/"
         }
         gradlePluginPortal()
-        mavenCentral()
-		maven {
-			name = 'Fabric'
-			url = 'https://maven.fabricmc.net/'
-		}
-		maven {
-			name = 'NeoForged'
-			url = 'https://maven.neoforged.net/releases'
-		}
     }
 }
 
 plugins {
     id("dev.kikugie.stonecutter") version "${stonecutter_version}"
-    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
-	id "com.diffplug.spotless" version "7.0.0.BETA4" apply false
+	id "com.diffplug.spotless" version "${spotless_version}" apply false
 	// This dependency is only used to determine the state of the Git working tree so that build artifacts can be
     // more easily identified. This setup is copied from sodium
-    id 'org.ajoberstar.grgit' version '5.2.1' apply false
+    id 'org.ajoberstar.grgit' version "${grgit_version}" apply false
 }
 
 def getVersionMetadata() {

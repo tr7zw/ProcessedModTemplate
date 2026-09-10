@@ -32,7 +32,7 @@ class TemplateBuildLogic {
     }
 
     static void configurePmd(Project project, String modBrand, String mcVersion) {
-        if (modBrand == 'fabric' && project.stonecutter.eval(mcVersion, '>= 1.21.11')) {
+        if (modBrand == 'fabric' && project.stonecutter.eval(mcVersion, '>= 26.2')) {
             project.apply plugin: 'pmd'
             project.pmd {
                 consoleOutput = true
@@ -181,19 +181,11 @@ class TemplateBuildLogic {
                 url 'https://maven.tr7zw.dev/repository/maven-public/'
             }
             maven {
-                name = 'tr7zw-tmp'
-                url 'https://maven.tr7zw.dev/repository/maven-tmp/'
-            }
-            maven {
                 name = 'Modrinth'
                 url = 'https://api.modrinth.com/maven'
                 content {
                     includeGroup 'maven.modrinth'
                 }
-            }
-            maven {
-                name = 'NeoForged'
-                url = 'https://maven.neoforged.net/releases'
             }
             mavenLocal()
         }
@@ -354,8 +346,6 @@ class TemplateBuildLogic {
                 modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
                 if (project.hasProperty('mod_menu_compile_only')) {
                     modCompileOnly "maven.modrinth:modmenu:${project.mod_menu_release}"
-                } else if (project.stonecutter.eval(mcVersion, '= 1.21.5')) {
-                    modImplementation 'terraformers:modmenu:14.0.0-rc2@jar'
                 } else {
                     modImplementation "maven.modrinth:modmenu:${project.mod_menu_release}"
                 }

@@ -3,9 +3,9 @@ import dev.tr7zw.TemplateBuildLogic
 
 plugins {
 	id 'net.fabricmc.fabric-loom' version "${loom_version}" apply false
-	id 'com.gradleup.shadow' version '9.1.0' apply false
-	id "com.diffplug.spotless" version "7.0.0.BETA4" apply false
-	id "me.modmuss50.mod-publish-plugin" version "2.2.0" apply false
+	id 'com.gradleup.shadow' version "${shadow_version}" apply false
+	id "com.diffplug.spotless" version "${spotless_version}" apply false
+	id "me.modmuss50.mod-publish-plugin" version "${mod_publish_version}" apply false
 	id 'maven-publish'
 }
 
@@ -16,7 +16,6 @@ apply plugin: 'me.modmuss50.mod-publish-plugin'
 apply plugin: 'com.diffplug.spotless'
 
 def mod_brand = "fabric"
-assert mod_brand in ['fabric', 'forge', 'neoforge']
 assert project.name.endsWith('-' + mod_brand)  // optional check
 
 def mcVersion = "${project.minecraft_version}"
@@ -104,9 +103,6 @@ dependencies {
 		sourceSets.main.resources.srcDirs += "${project.rootDir}/src/main/neoforge-resources"
 	}
 
-//    sourceSets.main.java.srcDirs += "${project.rootDir}/UtilityCode/${project.minecraft_version}/src/main/java"
-//	sourceSets.main.resources.srcDirs += "${project.rootDir}/UtilityCode/${project.minecraft_version}/src/main/resources"
-
 	$dependencies$
 
 	inc project(":$versionlessname$") 
@@ -115,15 +111,6 @@ dependencies {
 
 TemplateBuildLogic.applyOptionalDependencyScript(project)
 TemplateBuildLogic.configureLoomJarShadowPipeline(project, mod_brand)
-
-if (stonecutter.eval(mcVersion, "<= 1.20.4")) {
-	jvmdg.shadePath = new kotlin.jvm.functions.Function1<String, String>() {
-		@Override
-		String invoke(String it) {
-			return "$id$"
-		}
-	}
-}
 
 TemplateBuildLogic.configureTestTasks(project, mod_brand, mcVersion)
 
