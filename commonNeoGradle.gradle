@@ -3,7 +3,7 @@ import org.gradle.api.JavaVersion
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 
 plugins {
-	id 'net.neoforged.gradle.userdev' version "${neogradle_version}" apply false
+	id 'net.neoforged.moddev' version "${moddevgradle_version}" apply false
 	id 'com.gradleup.shadow' version "${shadow_version}" apply false
 	id "com.diffplug.spotless" version "${spotless_version}" apply false
 	id "me.modmuss50.mod-publish-plugin" version "${mod_publish_version}" apply false
@@ -20,7 +20,7 @@ assert project.name.endsWith('-' + mod_brand)
 
 def mcVersion = "${project.minecraft_version}"
 
-apply plugin: 'net.neoforged.gradle.userdev'
+apply plugin: 'net.neoforged.moddev'
 
 TemplateBuildLogic.configureStonecutter(project, mod_brand)
 TemplateBuildLogic.configurePmd(project, mod_brand, mcVersion)
@@ -32,11 +32,38 @@ java {
 	}
 }
 
-runs {
-	configureEach {
-		workingDirectory file('../../run')
-		dependencies {
-			runtime project.configurations.inc
+neoForge {
+	version = project.neoforge_version
+	validateAccessTransformers = true
+
+	runs {
+		client {
+			client()
+		}
+		server {
+			server()
+		}
+		// NeoForge split the "data" run type into clientData/serverData starting with the 26.x line.
+		if (stonecutter.eval(mcVersion, '>= 26.1')) {
+			clientData {
+				clientData()
+			}
+			serverData {
+				serverData()
+			}
+		} else {
+			data {
+				data()
+			}
+		}
+		configureEach {
+			gameDirectory = file('../../run')
+		}
+	}
+
+	mods {
+		register("$id$") {
+			sourceSet sourceSets.main
 		}
 	}
 }
@@ -57,7 +84,6 @@ dependencies {
 
 	TemplateBuildLogic.addLombokDependencies(project)
 
-	implementation "net.neoforged:neoforge:${project.neoforge_version}"
 	TemplateBuildLogic.addOptionalTemplateLibraries(project, mod_brand, 'implementation', 'implementation')
 
 	$neoforge_dependencies$
@@ -83,7 +109,6 @@ tasks.register('extractManifest', Copy) {
 	into layout.buildDirectory.dir('extractManifest')
 }
 
-// NeoGradle runs use local runtime conventions; extend them with inc so dev mode sees bundled libs.
 configurations.matching { cfg ->
 	cfg.name in ['runtimeClasspath', 'mainLocalRuntime', 'mainLocalRunRuntime', 'runs']
 }.configureEach {
@@ -114,48 +139,9 @@ jar {
 	finalizedBy shadowJar
 }
 
-tasks.register('replaceJarWithJarJar') {
-	doLast {
-		def jarJarTask = tasks.findByName('jarJar')
-		if (jarJarTask == null) {
-			return
-		}
-
-		File allJar = jarJarTask.archiveFile.get().asFile
-		File baseJar = tasks.named('jar').get().archiveFile.get().asFile
-		if (!allJar.exists()) {
-			return
-		}
-		if (baseJar.exists()) {
-			delete baseJar
-		}
-		allJar.renameTo(baseJar)
-	}
-}
 
 tasks.matching { it.name == 'jarJar' }.configureEach {
-	dependsOn shadowJar
-	outputs.file(tasks.named('jar').map { it.archiveFile })
-	finalizedBy tasks.named('replaceJarWithJarJar')
-}
-
-tasks.matching { it.name == 'reobfJar' }.configureEach {
-	if (tasks.names.contains('jarJar')) {
-		dependsOn tasks.named('replaceJarWithJarJar')
-		def jarOutput = tasks.named('jar').flatMap { it.archiveFile }
-		if (metaClass.hasProperty(delegate, 'input')) {
-			input = jarOutput
-		} else if (metaClass.hasProperty(delegate, 'inputFile')) {
-			inputFile = jarOutput
-		}
-	} else {
-		dependsOn shadowJar
-		if (metaClass.hasProperty(delegate, 'input')) {
-			input = shadowJar.archiveFile
-		} else if (metaClass.hasProperty(delegate, 'inputFile')) {
-			inputFile = shadowJar.archiveFile
-		}
-	}
+	enabled = false
 }
 
 def neoforgeVersionRange = project.hasProperty('neo_version_range') ? project.neo_version_range : ''
