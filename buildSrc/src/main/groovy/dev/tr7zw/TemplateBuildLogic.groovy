@@ -224,6 +224,7 @@ class TemplateBuildLogic {
 
                     artifact(project.tasks.named(artifactTaskName).map { it.archiveFile.get().asFile }) {
                         extension = 'jar'
+                        builtBy(project.tasks.named('shadowJar'))
                     }
                 }
             }
