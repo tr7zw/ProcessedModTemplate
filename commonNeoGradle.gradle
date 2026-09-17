@@ -140,10 +140,6 @@ jar {
 }
 
 
-tasks.matching { it.name == 'jarJar' }.configureEach {
-	enabled = false
-}
-
 def neoforgeVersionRange = project.hasProperty('neo_version_range') ? project.neo_version_range : ''
 def neoforgeLoaderVersion = project.hasProperty('loader_version_range_neoforge') ? project.loader_version_range_neoforge : ''
 def forgeLoaderVersion = project.hasProperty('loader_version_range_forge') ? project.loader_version_range_forge : ''
