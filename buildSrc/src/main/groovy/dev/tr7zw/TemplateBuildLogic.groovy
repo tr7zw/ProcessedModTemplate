@@ -97,6 +97,7 @@ class TemplateBuildLogic {
             '26.1.2'  : 84,
             '26.2'    : 88,
             '26.3'    : 97,
+            '26.4'    : 104,
         ]
     }
 
@@ -106,6 +107,9 @@ class TemplateBuildLogic {
             duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
             Integer packFormat = versionsMap[mcVersion]
+            if(packFormat == null) {
+                packFormat = versionsMap[mcVersion.split('-')[0]]
+            }
             println "Using Minecraft version: ${mcVersion} with pack format number: ${packFormat}"
 
             Map<String, Object> expandedProperties = new LinkedHashMap<>(replaceProperties)
@@ -220,7 +224,7 @@ class TemplateBuildLogic {
                 mavenJava(MavenPublication) {
                     groupId = project.group
                     artifactId = '$name$'
-                    version = "${project.rootProject.mod_version}-${project.minecraft_version}-${modBrand}-SNAPSHOT"
+                    version = "${project.rootProject.mod_version}-${project.minecraft_version.split('-')[0]}-${modBrand}-SNAPSHOT"
 
                     artifact(project.tasks.named(artifactTaskName).map { it.archiveFile.get().asFile }) {
                         extension = 'jar'
@@ -367,31 +371,31 @@ class TemplateBuildLogic {
             <addTRenderLib>
             <includeLibs>
             if (modBrand == 'neoforge' && project.stonecutter.eval(project.minecraft_version.toString(), '>= 26.0')) {
-                jarJar("dev.tr7zw:TRender:${project.rootProject.trender_version}-${project.minecraft_version}-${modBrand}-SNAPSHOT@jar") {
+                jarJar("dev.tr7zw:TRender:${project.rootProject.trender_version}-${project.minecraft_version.split('-')[0]}-${modBrand}-SNAPSHOT@jar") {
                     changing = true
                 }
             } else {
-                include("dev.tr7zw:TRender:${project.rootProject.trender_version}-${project.minecraft_version}-${modBrand}-SNAPSHOT@jar") {
+                include("dev.tr7zw:TRender:${project.rootProject.trender_version}-${project.minecraft_version.split('-')[0]}-${modBrand}-SNAPSHOT@jar") {
                     changing = true
                 }
             }
             </includeLibs>
-            "${implementationConfiguration}"("dev.tr7zw:TRender:${project.rootProject.trender_version}-${project.minecraft_version}-${modBrand}-SNAPSHOT@jar")
+            "${implementationConfiguration}"("dev.tr7zw:TRender:${project.rootProject.trender_version}-${project.minecraft_version.split('-')[0]}-${modBrand}-SNAPSHOT@jar")
             </addTRenderLib>
 
             <addTRansitionLib>
             <includeLibs>
             if (modBrand == 'neoforge' && project.stonecutter.eval(project.minecraft_version.toString(), '>= 26.0')) {
-                jarJar("dev.tr7zw:TRansition:${project.rootProject.transition_version}-${project.minecraft_version}-${modBrand}-SNAPSHOT@jar") {
+                jarJar("dev.tr7zw:TRansition:${project.rootProject.transition_version}-${project.minecraft_version.split('-')[0]}-${modBrand}-SNAPSHOT@jar") {
                     changing = true
                 }
             } else {
-                include("dev.tr7zw:TRansition:${project.rootProject.transition_version}-${project.minecraft_version}-${modBrand}-SNAPSHOT@jar") {
+                include("dev.tr7zw:TRansition:${project.rootProject.transition_version}-${project.minecraft_version.split('-')[0]}-${modBrand}-SNAPSHOT@jar") {
                     changing = true
                 }
             }
             </includeLibs>
-            "${implementationConfiguration}"("dev.tr7zw:TRansition:${project.rootProject.transition_version}-${project.minecraft_version}-${modBrand}-SNAPSHOT@jar")
+            "${implementationConfiguration}"("dev.tr7zw:TRansition:${project.rootProject.transition_version}-${project.minecraft_version.split('-')[0]}-${modBrand}-SNAPSHOT@jar")
             </addTRansitionLib>
 
             <mixinextras>
